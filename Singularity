@@ -76,6 +76,7 @@ From: ubuntu:20.04
     libboost-all-dev
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
+  apt-get install -y libgsl-dev
 
   # Add a default CRAN mirror
   echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/lib/R/etc/Rprofile.site
@@ -134,6 +135,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("ggpubr")'
   R --slave -e 'install.packages("rmarkdown", dep = TRUE)'
   R --slave -e 'install.packages("ggvenn")'
+  R --slave -e 'install.packages("fido")'
 
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
@@ -152,6 +154,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("organism")'
   R --slave -e 'BiocManager::install("enrichplot")'
   R --slave -e 'BiocManager::install("pathview")'
+  R --slave -e 'BiocManager::install("phyloseq")'
 
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
@@ -163,6 +166,7 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("pcahan1/singleCellNet")'
   R --slave -e 'devtools::install_github("powellgenomicslab/scPred")'
   R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
+  R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
