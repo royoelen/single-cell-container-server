@@ -52,7 +52,7 @@ To use the singularity image on the UMCG HPC gearshift cluster, a bit of setup i
 
 STEP 1
 
-Choose a location to put all of your files. The home folder on the Gearshift cluster is too small, so preferably set up a directory in one of the group folders you are a member of. For example if you are a member of the 'weersma' group, you can set up a directory in */groups/umcg-weersma/tmp01/user/${USER}/*
+Choose a location to put all of your files. The home folder on the Gearshift cluster is too small, so preferably set up a directory in one of the group folders you are a member of. For example if you are a member of the 'weersma' group, you can set up a directory in */groups/umcg-weersma/tmp01/users/${USER}/*
 
 if there are already singularity folders in your home folder, we need to move them. check if there are the *.singularity* and *singularity* folders in your home directory by using:
 ```sh
@@ -61,29 +61,29 @@ ls -lah ~
 
 for each of these two folders, if they exist they need to be moved:
 ```sh
-mv ~/.singularity /groups/umcg-weersma/tmp01/user/${USER}/
-mv ~/singularity /groups/umcg-weersma/tmp01/user/${USER}/
+mv ~/.singularity /groups/umcg-weersma/tmp01/users/${USER}/
+mv ~/singularity /groups/umcg-weersma/tmp01/users/${USER}/
 ```
 
 if they don’t exist they need to made in the new location:
 ```sh
-mkdir -p /groups/umcg-weersma/tmp01/user/${USER}/.singularity/
-mkdir -p /groups/umcg-weersma/tmp01/user/${USER}/singularity/
+mkdir -p /groups/umcg-weersma/tmp01/users/${USER}/.singularity/
+mkdir -p /groups/umcg-weersma/tmp01/users/${USER}/singularity/
 ```
 
 next we need to link these back to your home folder
 ```sh
-ln -s /groups/umcg-weersma/tmp01/user/${USER}/.singularity ~/
-ln -s /groups/umcg-weersma/tmp01/user/${USER}/singularity ~/
+ln -s /groups/umcg-weersma/tmp01/users/${USER}/.singularity ~/
+ln -s /groups/umcg-weersma/tmp01/users/${USER}/singularity ~/
 ```
 now to make a folder to house the singularity container:
 ```sh
-mkdir -p /groups/umcg-weersma/tmp01/user/${USER}/singularity/rstudio-server/
+mkdir -p /groups/umcg-weersma/tmp01/users/${USER}/singularity/rstudio-server/
 ```
 
 and a simulated home directory, so that when you install new R libraries, they don’t conflict with the cluster versions
 ```sh
-mkdir -p /groups/umcg-weersma/tmp01/user/${USER}/singularity/rstudio-server/simulated_home/
+mkdir -p /groups/umcg-weersma/tmp01/users/${USER}/singularity/rstudio-server/simulated_home/
 ```
 
 to use the singularity image, it needs to be downloaded from the Google Drive to the cluster, or uploaded to the cluster from your own machine, using rsync. If for example you had the image downloaded in your downloads folder on your mac, you could do (remember to change the username/group/downloadname):
