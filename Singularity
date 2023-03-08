@@ -81,8 +81,15 @@ From: ubuntu:20.04
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
   export DEBIAN_FRONTEND=noninteractive
+  # install CUDA 11
   wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
   mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2004-11-8-local_11.8.0-520.61.05-1_amd64.deb
+  dpkg -i cuda-repo-ubuntu2004-11-8-local_11.8.0-520.61.05-1_amd64.deb
+  cp /var/cuda-repo-ubuntu2004-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  apt-get update
+  apt-get -y install cuda-11.8
+  # now latest CUDA
   wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
   dpkg -i cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
   cp /var/cuda-repo-ubuntu2004-12-1-local/cuda-*-keyring.gpg /usr/share/keyrings/
@@ -121,6 +128,28 @@ From: ubuntu:20.04
 
   # set the server directory to be in /home, because the container is not writeable
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
+
+  # install conda
+  export CONDA_VERSION=Anaconda3-2022.10-Linux-x86_64
+  wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
+  bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
+  chmod +x /opt/anaconda3
+  ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  rm ${CONDA_VERSION}.sh
+  # install python tools
+  /opt/anaconda3/bin/conda config --add channels defaults
+  /opt/anaconda3/bin/conda config --add channels bioconda
+  /opt/anaconda3/bin/conda config --add channels conda-forge
+  # install libraries
+  conda install -c anaconda numpy
+  conda install -c anaconda pandas
+  conda install -c anaconda scikit-learn
+  conda install -c anaconda seaborn
+  conda install -c bioconda scanpy
+  conda install -c conda-forge jupyterlab
+  conda install -c conda-forge tensorflow
+  pip install tensorflow-gpu
+  pip install scCODA
 
   # install r packages
   R --slave -e 'install.packages("devtools")'
@@ -177,6 +206,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("MOFA2")'
   R --slave -e 'BiocManager::install("muscat")'
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
+  R --slave -e 'BiocManager::install("UCell")'
 
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
