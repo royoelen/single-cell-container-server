@@ -88,7 +88,7 @@ From: ubuntu:20.04
   dpkg -i cuda-repo-ubuntu2004-11-8-local_11.8.0-520.61.05-1_amd64.deb
   cp /var/cuda-repo-ubuntu2004-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
   apt-get update
-  apt-get -y install cuda-11.8
+  apt-get -y install cuda-11-8
   # now latest CUDA
   wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
   dpkg -i cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
@@ -148,8 +148,9 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install -c bioconda scanpy
   /opt/anaconda3/bin/conda install -c conda-forge jupyterlab
   /opt/anaconda3/bin/conda install -c conda-forge tensorflow
-  pip install tensorflow-gpu
-  pip install scCODA
+  /opt/anaconda3/bin/conda install pip
+  /opt/anaconda3/bin/pip install tensorflow-gpu
+  /opt/anaconda3/bin/pip install scCODA
 
   # install r packages
   R --slave -e 'install.packages("devtools")'
