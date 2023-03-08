@@ -141,13 +141,13 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda config --add channels bioconda
   /opt/anaconda3/bin/conda config --add channels conda-forge
   # install libraries
-  conda install -c anaconda numpy
-  conda install -c anaconda pandas
-  conda install -c anaconda scikit-learn
-  conda install -c anaconda seaborn
-  conda install -c bioconda scanpy
-  conda install -c conda-forge jupyterlab
-  conda install -c conda-forge tensorflow
+  /opt/anaconda3/bin/conda install -c anaconda numpy
+  /opt/anaconda3/bin/conda install -c anaconda pandas
+  /opt/anaconda3/bin/conda install -c anaconda scikit-learn
+  /opt/anaconda3/bin/conda install -c anaconda seaborn
+  /opt/anaconda3/bin/conda install -c bioconda scanpy
+  /opt/anaconda3/bin/conda install -c conda-forge jupyterlab
+  /opt/anaconda3/bin/conda install -c conda-forge tensorflow
   pip install tensorflow-gpu
   pip install scCODA
 
