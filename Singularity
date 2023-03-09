@@ -74,7 +74,8 @@ From: ubuntu:20.04
     cmake \
     libhdf5-serial-dev \
     libboost-all-dev \
-    git
+    git \
+    default-jdk
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -151,6 +152,13 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install -c conda-forge tensorflow
   /opt/anaconda3/bin/conda install pip
   /opt/anaconda3/bin/pip install scCODA
+  # patch macs2
+  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
+  tar -xvf MACS.tar.gz
+  cd MACS-2.2.7.1
+  sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
+  /opt/anaconda3/bin/pip install -e .
+  cd
   # and one from source
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
@@ -191,6 +199,8 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("optparse")'
   R --slave -e 'install.packages("MASS")'
   R --slave -e 'install.packages("networkD3")'
+  R --slave -e 'install.packages("xlsx")'
+  R --slave -e 'install.packages("openxlsx")'
 
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
