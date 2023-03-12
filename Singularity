@@ -160,6 +160,7 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/pip install -e .
   cd
   # and one from source
+  export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
   /opt/anaconda3/bin/pip install -e .
