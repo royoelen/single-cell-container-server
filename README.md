@@ -88,7 +88,7 @@ mkdir -p /groups/umcg-weersma/tmp01/users/${USER}/singularity/rstudio-server/sim
 
 to use the singularity image, it needs to be downloaded from the Google Drive to the cluster, or uploaded to the cluster from your own machine, using rsync. If for example you had the image downloaded in your downloads folder on your mac, you could do (remember to change the username/group/downloadname):
 ```sh
-rsync ~/Downloads/name_you_saved_image_under.simg airlock+gearshift:/groups/umcg-weersma/tmp01/user/umcg-whatever_your_username_is/singularity/rstudio-server/singularity-rstudio.simg
+rsync ~/Downloads/name_you_saved_image_under.simg airlock+gearshift:/groups/umcg-weersma/tmp01/users/umcg-whatever_your_username_is/singularity/rstudio-server/singularity-rstudio.simg
 ```
 
 finally, we want to make it easy to start the server, so we'll create a startup script with the following contents. You can use nano to create a file and copy in the contents. The CTRL+O to save, and CTRL+X to exit. I will be naming the file *start_server_computenode.sh*, and saving it in my actual home directory *~/*

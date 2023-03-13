@@ -72,6 +72,8 @@ From: ubuntu:20.04
     libtiff5-dev \
     libjpeg-dev \
     cmake \
+    make \
+    g++ \
     libhdf5-serial-dev \
     libboost-all-dev \
     git \
@@ -164,7 +166,16 @@ From: ubuntu:20.04
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
   /opt/anaconda3/bin/pip install -e .
-
+  cd
+  # install new version of tensorflow with pip
+  /opt/anaconda3/bin/pip install tensorflow
+  # pascalX
+  git clone https://github.com/BergmannLab/PascalX.git
+  cd PascalX
+  make all
+  cd python
+  /opt/anaconda3/bin/python setup.py install
+  cd
 
   # install r packages
   R --slave -e 'install.packages("devtools")'
