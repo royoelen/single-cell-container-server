@@ -254,9 +254,9 @@ From: ubuntu:20.04
   # update Seurat
   R --slave -e 'remotes::install_github("satijalab/seurat", "seurat5", quiet = TRUE)'
   R --slave -e 'remotes::install_github("mojaveazure/seurat-disk")'
+  R --slave -e 'remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)'
   R --slave -e 'remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)'
   R --slave -e 'remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)'
-  R --slave -e 'remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)'
   R --slave -e 'remotes::install_github("bnprks/BPCells", quiet = TRUE)'
   
   # manual stuff
