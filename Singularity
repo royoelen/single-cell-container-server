@@ -251,6 +251,14 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
 
+  # update Seurat
+  R --slave -e 'remotes::install_github("satijalab/seurat", "seurat5", quiet = TRUE)'
+  R --slave -e 'remotes::install_github("mojaveazure/seurat-disk")'
+  R --slave -e 'remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)'
+  R --slave -e 'remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)'
+  R --slave -e 'remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)'
+  R --slave -e 'remotes::install_github("bnprks/BPCells", quiet = TRUE)'
+  
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
   tar -xf rpux_0.7.2_linux.tar.gz
