@@ -237,6 +237,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("muscat")'
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
   R --slave -e 'BiocManager::install("UCell")'
+  R --slave -e 'BiocManager::install("batchelor")'
 
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
