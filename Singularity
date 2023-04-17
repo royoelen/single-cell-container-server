@@ -77,6 +77,7 @@ From: ubuntu:20.04
     libhdf5-serial-dev \
     libboost-all-dev \
     git \
+    libgit2-dev \
     default-jdk
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
