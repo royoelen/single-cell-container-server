@@ -178,6 +178,8 @@ From: ubuntu:20.04
   cd
 
   # install r packages
+  R --slave -e 'install.packages("gert")'
+  R --slave -e 'install.packages("usethis")'
   R --slave -e 'install.packages("devtools")'
   R --slave -e 'install.packages("BiocManager")'
 
