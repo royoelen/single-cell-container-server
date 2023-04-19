@@ -254,14 +254,16 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
   R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
+  R --slave -e 'devtools::install_github("satijalab/seurat-data")'
+  R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
 
   # update Seurat
-  R --slave -e 'remotes::install_github("satijalab/seurat", "seurat5", quiet = TRUE)'
-  R --slave -e 'remotes::install_github("mojaveazure/seurat-disk")'
-  R --slave -e 'remotes::install_github("stuart-lab/signac", "seurat5", quiet = TRUE)'
-  R --slave -e 'remotes::install_github("satijalab/azimuth", "seurat5", quiet = TRUE)'
-  R --slave -e 'remotes::install_github("satijalab/seurat-wrappers", "seurat5", quiet = TRUE)'
-  R --slave -e 'remotes::install_github("bnprks/BPCells", quiet = TRUE)'
+  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
+  #R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("bnprks/BPCells")'
   
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
@@ -272,3 +274,4 @@ From: ubuntu:20.04
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
+
