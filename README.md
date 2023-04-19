@@ -209,7 +209,128 @@ You can then use *~/start_Rscript.sh* instead of the usual *Rscript* command to 
 
 #### Peregrine cluster
 
-TODO
+Peregrine is no longer operational
+
+#### Habrok cluster
+
+To use the singularity image on the RUG Habrok cluster, a bit of setup is required. This is described in step 1. After setting up, only step 2 and 3 need to be repeated for using the image.
+
+STEP 1
+
+we need to place the singularity image and related files somewhere. Fortunately, you have a bit of storage in your home folder on Habrok. As such it is probably most convenient to place these things in your home directory. Here we will create a folder in our home folder for singularity.
+
+```sh
+mkdir -p /home3/${USER}/singularity/rstudio-server/
+```
+
+we will also simulate a home directory for the singularity image, so our manually installed libraries for the image do not conflict with the R version that might be installed on the cluster itself
+
+```sh
+mkdir -p /home3/${USER}/singularity/rstudio-server/simulated_home/
+```
+
+to use the singularity image, it needs to be downloaded from the Google Drive to the cluster, or uploaded to the cluster from your own machine, using rsync. If for example you had the image downloaded in your downloads folder on your mac, you could do (remember to change the username/downloadname):
+
+```sh
+rsync ~/Downloads/name_you_saved_image_under.simg your_p_number@login1.hb.hpc.rug.nl:/home3/your_p_number/singularity/rstudio-server/singularity-rstudio.simg
+```
+
+finally, we want to make it easy to start the server, so we'll create a startup script with the following contents. You can use nano to create a file and copy in the contents. The CTRL+O to save, and CTRL+X to exit. I will be naming the file *start_server_computenode.sh*, and saving it in my actual home directory *~/*
+
+```sh
+#!/bin/bash
+mkdir -p ${TMPDIR}/rstudio-server-logging
+mkdir -p ${TMPDIR}/etc
+mkdir -p ${TMPDIR}/tmp
+mkdir -p ${TMPDIR}/server-data
+mkdir -p ${TMPDIR}/lib
+echo "www-port=8754" > ${TMPDIR}/etc/rserver.conf
+singularity run  --bind \
+/home3/${USER}/singularity/rstudio-server/simulated_home:/home/${USER},\
+/home3/${USER}/singularity/rstudio-server/simulated_home:/home3/${USER},\
+/scratch/${USER}/,\
+${TMPDIR},\
+${TMPDIR}/rstudio-server-logging:/var/run/rstudio-server,\
+${TMPDIR}/lib:/var/lib/rstudio-server,\
+${TMPDIR}/etc:/etc/rstudio,\
+${TMPDIR}/tmp:/tmp \
+/home3/${USER}/singularity/rstudio-server/singularity-rstudio.simg \
+--server-user ${USER} \
+--server-data-dir ${TMPDIR}/server-data/ \
+--server-daemonize 0 \
+--secure-cookie-key-file ~/server-data/rserver_cookie
+```
+
+Okay, that was the setup, now to use the container
+
+
+STEP 2
+
+If you are using Windows, I am assuming you can use ssh via the (git bash) command line, otherwise you will run into issues when forwarding the ports. If you need help setting up ssh via the command line in Windows, you can use this tutorial: https://ssh-and-rsync-for-windows.readthedocs.io/en/latest/
+Mac OSX and Linux users do not have to worry about this
+
+open a screen session on the cluster
+
+
+```sh
+screen -S rserver
+```
+
+request the amount of resources you think you need, and be sure to ask for temporary storage
+```sh
+srun --cpus-per-task=8 --mem=64gb --nodes=1 --qos=priority --time=23:59:59 --job-name=rstudio_server --tmp=10GB --pty bash -i
+```
+
+once you get your session, check if the port in your *start_server_computenode.sh* file is available
+```sh
+lsof -i:8754
+```
+
+if you get output, it means the port is in use. Use nano to change the port to one that is not already taken
+
+when you have found a port, you can start the server simply by using
+
+```sh
+~/start_server_computenode.sh
+```
+
+if you don't get any errors, the server has started. You can keep the server running in the background and leave the screen session with CTRL+A,D.
+
+Next we need to find out on which node our server is running. You can use squeue to see all of your current jobs, including this interactive one. The thing we are interested in, is the last column of the row that has our interactive job, as that shows us which of the compute nodes our interactive session is running on.
+
+```sh
+squeue -u ${USER}
+```
+
+In the list, find your interactive session and take note of the last column. This is the name of the node that the session is running on. Because we cannot bind directly to the node, we will bind through the login node. This basically makes the binds local_compute>login_node>node_with_session.
+
+Let us do the first step, where we forward a port on the login node, to one on the node that is running the session. Just like with that compute node, we need to find a free port. We can first see if we can just use the same one as the one on the compute node (8754 in our example)
+
+```sh
+lsof -i:8754
+```
+
+If there is output, that one is already taken. For this example, let us assume the worst case scenario where we need a new port. We will thus instead use port 8745 on the login node. Assuming that the output of squeue before gave us 'memory2' as the node where our interactive session is running one, we can configure the port forward on the login node like this:
+
+```sh
+ssh -N -f -L localhost:8745:localhost:8754 memory2
+```
+
+This will make port 8745 forward to port 8754 on the 'memory2' node. Of course if the output of squeue was a different node for you, you need to use that one.
+
+Okay, that was login_node to compute node. Now we need to do the same trick to go from our local machine to the login node. Open a terminal on your local machine (so not connected to the cluster), and choose a local port (in the example we will use 8787). And you will need the port you chose on the login node before. You can then do another port forward to connect your machine to the login node.
+
+```sh
+ssh -N -f -L localhost:8787:localhost:8745 your_p_number@login1.hb.hpc.rug.nl
+```
+
+now you should be able to go to localhost:8787 (or an other port if you chose a different local port, and be connect to rstudio on the cluster)
+
+If you lose your internet connection (due to your laptop going into sleep mode for example), you can re-execute the previous command again to get back the forwarding of your local port to the port on the cluster. You might have to reload the webpage as well.
+
+When you want to stop the server (due to a hangup or because you need the interactive session for something else), you can reconnect on the cluster to the screen session (by the name you gave it, or the ID it has, see *screen -ls* for example), and killing it with CTRL+C.
+
+Using the settings supplied in the examples here, you will have a home directory for the image, that is separate from your regular home directory. This will allow you to install additional R libraries to use with the container, without it interfering with local R installations.
 
 
 #### Simple Password Authentication
