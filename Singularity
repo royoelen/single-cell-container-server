@@ -77,6 +77,7 @@ From: ubuntu:20.04
     libhdf5-serial-dev \
     libboost-all-dev \
     git \
+    libgit2-dev \
     default-jdk
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
@@ -178,6 +179,8 @@ From: ubuntu:20.04
   cd
 
   # install r packages
+  R --slave -e 'install.packages("gert")'
+  R --slave -e 'install.packages("usethis")'
   R --slave -e 'install.packages("devtools")'
   R --slave -e 'install.packages("BiocManager")'
 
@@ -237,6 +240,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("muscat")'
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
   R --slave -e 'BiocManager::install("UCell")'
+  R --slave -e 'BiocManager::install("batchelor")'
 
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
@@ -250,7 +254,17 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
   R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
+  R --slave -e 'devtools::install_github("satijalab/seurat-data")'
+  R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
 
+  # update Seurat
+  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
+  #R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("bnprks/BPCells")'
+  
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
   tar -xf rpux_0.7.2_linux.tar.gz
@@ -260,3 +274,4 @@ From: ubuntu:20.04
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
+
