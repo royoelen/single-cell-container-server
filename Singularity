@@ -3,7 +3,7 @@ From: ubuntu:20.04
 
 %labels
   Maintainer Jeremy Nicklas, Roy Oelen
-  RStudio_Version 0.91.10
+  RStudio_Version 2023.03.0-386
 
 %help
   This will run RStudio Server
@@ -27,7 +27,7 @@ From: ubuntu:20.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2022.07.0-548
+  export RSTUDIO_VERSION=2023.03.0-386
 
   # Get dependencies
   apt-get update
@@ -178,12 +178,20 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/python setup.py install
   cd
 
+  # set github access token
+  #echo 'GITHUB_PAT="your_pat_key_if_you_want"' >> .Renviron
+
   # install r packages
   R --slave -e 'install.packages("gert")'
   R --slave -e 'install.packages("usethis")'
   R --slave -e 'install.packages("devtools")'
   R --slave -e 'install.packages("BiocManager")'
 
+  # set github tokens
+  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
+  #R --slave -e 'credentials::set_github_pat("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")'
+
+  # go on with installation of CRAN packages
   R --slave -e 'install.packages("R.utils")'
   R --slave -e 'install.packages("optparse")'
   R --slave -e 'install.packages("reshape2")'
@@ -218,8 +226,10 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
 
+  # manually install package that has been removed from CRAN
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
+  # install packages from BioConductor
   R --slave -e 'BiocManager::install("MAST")'
   R --slave -e 'BiocManager::install("variancePartition")'
   R --slave -e 'BiocManager::install("edgeR")'
@@ -241,7 +251,8 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
   R --slave -e 'BiocManager::install("UCell")'
   R --slave -e 'BiocManager::install("batchelor")'
-
+  
+  # install packages via github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
   R --slave -e 'devtools::install_github("saeyslab/nichenetr")'
@@ -257,13 +268,12 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("satijalab/seurat-data")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
 
-  # update Seurat
-  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
-  #R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  #R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
-  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
-  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
-  #R --slave -e 'devtools::install_github("bnprks/BPCells")'
+  # update Seurat  
+  R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
+  R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
+  R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
+  R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
+  R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
   
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
@@ -272,6 +282,13 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("rpud_0.7.2.tar.gz")'
   R --slave -e 'install.packages("rpudplus_0.7.2.tar.gz")'
 
+  # this library is a bit problematic
+  export CFLAGS='-mssse3'
+  R --slave -e 'devtools::install_github("bnprks/BPCells")'
+
   # Clean up
   rm -rf /var/lib/apt/lists/*
+
+  # remove the Renviron containing my info as well
+  # rm .Renviron
 
