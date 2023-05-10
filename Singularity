@@ -179,7 +179,7 @@ From: ubuntu:20.04
   cd
 
   # set github access token
-  #echo 'GITHUB_PAT="your_pat_key_if_you_want"' >> .Renviron
+  echo 'GITHUB_PAT="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"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -189,7 +189,7 @@ From: ubuntu:20.04
 
   # set github tokens
   R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
-  #R --slave -e 'credentials::set_github_pat("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")'
+  #R --slave -e 'credentials::set_github_pat("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")'
 
   # go on with installation of CRAN packages
   R --slave -e 'install.packages("R.utils")'
@@ -251,6 +251,8 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
   R --slave -e 'BiocManager::install("UCell")'
   R --slave -e 'BiocManager::install("batchelor")'
+  R --slave -e 'BiocManager::install("TOAST")'
+
   
   # install packages via github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
@@ -267,6 +269,9 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
   R --slave -e 'devtools::install_github("satijalab/seurat-data")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
+  R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
+  R --slave -e 'ArchR::installExtraPackages()'
+  R --slave -e 'devtools::install_github("xuranw/MuSiC")'
 
   # update Seurat  
   R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
@@ -291,4 +296,3 @@ From: ubuntu:20.04
 
   # remove the Renviron containing my info as well
   # rm .Renviron
-
