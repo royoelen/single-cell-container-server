@@ -224,6 +224,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
+  R --slave -e 'install.packages("statmod")'
 
   # manually install package that has been removed from CRAN
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -251,6 +252,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("UCell")'
   R --slave -e 'BiocManager::install("batchelor")'
   R --slave -e 'BiocManager::install("TOAST")'
+  R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
 
   
   # install packages via github
@@ -271,6 +273,7 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
   R --slave -e 'ArchR::installExtraPackages()'
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
+  R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = TRUE, repos = BiocManager::repositories())'
 
   # update Seurat  
   R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
