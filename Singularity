@@ -179,7 +179,7 @@ From: ubuntu:20.04
   cd
 
   # set github access token
-  echo 'GITHUB_PAT="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"' >> .Renviron
+  echo 'GITHUB_PAT="ghp_yourpath"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -188,9 +188,8 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # set github tokens
-  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
-  #R --slave -e 'credentials::set_github_pat("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")'
-
+  R --slave -e 'usethis::use_git_config(user.name = "username", user.email = "username@email.com")'
+  
   # go on with installation of CRAN packages
   R --slave -e 'install.packages("R.utils")'
   R --slave -e 'install.packages("optparse")'
