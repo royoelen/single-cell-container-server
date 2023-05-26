@@ -31,6 +31,8 @@ From: ubuntu:20.04
 
   # Get dependencies
   apt-get update
+  apt-get upgrade -y
+  apt-get update --fix-missing
   apt-get install -y --no-install-recommends \
     locales
 
@@ -78,7 +80,8 @@ From: ubuntu:20.04
     libboost-all-dev \
     git \
     libgit2-dev \
-    default-jdk
+    default-jdk \
+    libgmp3-dev
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -178,8 +181,11 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/python setup.py install
   cd
 
+  # copy pandoc libraries
+  ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
+
   # set github access token
-  echo 'GITHUB_PAT="ghp_yourpath"' >> .Renviron
+  echo 'GITHUB_PAT="your_pat"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -188,7 +194,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # set github tokens
-  R --slave -e 'usethis::use_git_config(user.name = "username", user.email = "username@email.com")'
+  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
   
   # go on with installation of CRAN packages
   R --slave -e 'install.packages("R.utils")'
@@ -253,6 +259,8 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("batchelor")'
   R --slave -e 'BiocManager::install("TOAST")'
   R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
+  R --slave -e 'BiocManager::install("BuenColors")'
+  R --slave -e 'BiocManager::install("Rmpfr")'
 
   
   # install packages via github
@@ -274,6 +282,7 @@ From: ubuntu:20.04
   R --slave -e 'ArchR::installExtraPackages()'
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
   R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = TRUE, repos = BiocManager::repositories())'
+  R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
 
   # update Seurat  
   R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
