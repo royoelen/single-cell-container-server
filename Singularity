@@ -81,7 +81,8 @@ From: ubuntu:20.04
     git \
     libgit2-dev \
     default-jdk \
-    libgmp3-dev
+    libgmp3-dev \
+    libmagick++-dev
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -163,13 +164,13 @@ From: ubuntu:20.04
   tar -xvf MACS.tar.gz
   cd MACS-2.2.7.1
   sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
-  /opt/anaconda3/bin/pip install -e .
+  # /opt/anaconda3/bin/pip install -e .
   cd
   # and one from source
   export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
-  /opt/anaconda3/bin/pip install -e .
+  # /opt/anaconda3/bin/pip install -e .
   cd
   # install new version of tensorflow with pip
   /opt/anaconda3/bin/pip install tensorflow
@@ -185,7 +186,7 @@ From: ubuntu:20.04
   ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
 
   # set github access token
-  echo 'GITHUB_PAT="your_pat"' >> .Renviron
+  echo 'GITHUB_PAT="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"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -281,8 +282,11 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
   R --slave -e 'ArchR::installExtraPackages()'
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
-  R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = TRUE, repos = BiocManager::repositories())'
+  R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
+
+  # spatial transcriptomics
+  R --slave -e 'remotes::install_github("ludvigla/semla")'
 
   # update Seurat  
   R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
