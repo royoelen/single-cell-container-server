@@ -217,6 +217,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
+  R --slave -e 'install.packages("ggdendro")'
 
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
