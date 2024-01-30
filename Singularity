@@ -160,33 +160,33 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install pip
   /opt/anaconda3/bin/pip install scCODA
   # patch macs2
-  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
-  tar -xvf MACS.tar.gz
-  cd MACS-2.2.7.1
-  sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
+  #wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
+  #tar -xvf MACS.tar.gz
+  #cd MACS-2.2.7.1
+  #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
   # /opt/anaconda3/bin/pip install -e .
-  cd
+  #cd
   # and one from source
-  export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-  git clone https://github.com/aertslab/scenicplus
-  cd scenicplus
+  #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+  #git clone https://github.com/aertslab/scenicplus
+  #cd scenicplus
   # /opt/anaconda3/bin/pip install -e .
-  cd
+  #cd
   # install new version of tensorflow with pip
-  /opt/anaconda3/bin/pip install tensorflow
+  #/opt/anaconda3/bin/pip install tensorflow
   # pascalX
-  git clone https://github.com/BergmannLab/PascalX.git
-  cd PascalX
-  make all
-  cd python
-  /opt/anaconda3/bin/python setup.py install
-  cd
+  #git clone https://github.com/BergmannLab/PascalX.git
+  #cd PascalX
+  #make all
+  #cd python
+  #/opt/anaconda3/bin/python setup.py install
+  #cd
 
   # copy pandoc libraries
   ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
 
   # set github access token
-  echo 'GITHUB_PAT="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"' >> .Renviron
+  echo 'GITHUB_PAT="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"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -231,7 +231,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
-  R --slave -e 'install.packages("statmod")'
+  R --slave -e 'install.packages("statmod")'  
 
   # manually install package that has been removed from CRAN
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -289,11 +289,11 @@ From: ubuntu:20.04
   R --slave -e 'remotes::install_github("ludvigla/semla")'
 
   # update Seurat  
-  R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
-  R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
-  R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  R --slave -e 'devtools::install_github("stuart-lab/signac")'
+  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
   
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
