@@ -3,7 +3,7 @@ From: ubuntu:20.04
 
 %labels
   Maintainer Jeremy Nicklas, Roy Oelen
-  RStudio_Version 2023.03.0-386
+  RStudio_Version 2023.12.1-402
 
 %help
   This will run RStudio Server
@@ -27,10 +27,12 @@ From: ubuntu:20.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2023.03.0-386
+  export RSTUDIO_VERSION=2023.12.1-402
 
   # Get dependencies
   apt-get update
+  apt-get upgrade -y
+  apt-get update --fix-missing
   apt-get install -y --no-install-recommends \
     locales
 
@@ -78,7 +80,10 @@ From: ubuntu:20.04
     libboost-all-dev \
     git \
     libgit2-dev \
-    default-jdk
+    default-jdk \
+    libgmp3-dev \
+    libmagick++-dev \
+    libtool
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -117,7 +122,7 @@ From: ubuntu:20.04
   wget \
     --no-verbose \
     -O rstudio-server.deb \
-    "https://download2.rstudio.org/server/bionic/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb"
+    "https://download2.rstudio.org/server/focal/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb"
   gdebi -n rstudio-server.deb
   rm -f rstudio-server.deb
 
@@ -156,30 +161,33 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install pip
   /opt/anaconda3/bin/pip install scCODA
   # patch macs2
-  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
-  tar -xvf MACS.tar.gz
-  cd MACS-2.2.7.1
-  sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
-  /opt/anaconda3/bin/pip install -e .
-  cd
+  #wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
+  #tar -xvf MACS.tar.gz
+  #cd MACS-2.2.7.1
+  #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
+  # /opt/anaconda3/bin/pip install -e .
+  #cd
   # and one from source
-  export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-  git clone https://github.com/aertslab/scenicplus
-  cd scenicplus
-  /opt/anaconda3/bin/pip install -e .
-  cd
+  #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+  #git clone https://github.com/aertslab/scenicplus
+  #cd scenicplus
+  # /opt/anaconda3/bin/pip install -e .
+  #cd
   # install new version of tensorflow with pip
-  /opt/anaconda3/bin/pip install tensorflow
+  #/opt/anaconda3/bin/pip install tensorflow
   # pascalX
-  git clone https://github.com/BergmannLab/PascalX.git
-  cd PascalX
-  make all
-  cd python
-  /opt/anaconda3/bin/python setup.py install
-  cd
+  #git clone https://github.com/BergmannLab/PascalX.git
+  #cd PascalX
+  #make all
+  #cd python
+  #/opt/anaconda3/bin/python setup.py install
+  #cd
+
+  # copy pandoc libraries
+  ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
 
   # set github access token
-  #echo 'GITHUB_PAT="your_pat_key_if_you_want"' >> .Renviron
+  echo 'GITHUB_PAT="yourpat"' >> .Renviron
 
   # install r packages
   R --slave -e 'install.packages("gert")'
@@ -189,8 +197,7 @@ From: ubuntu:20.04
 
   # set github tokens
   R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
-  #R --slave -e 'credentials::set_github_pat("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")'
-
+  
   # go on with installation of CRAN packages
   R --slave -e 'install.packages("R.utils")'
   R --slave -e 'install.packages("optparse")'
@@ -225,6 +232,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
+  R --slave -e 'install.packages("statmod")'  
 
   # manually install package that has been removed from CRAN
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -251,6 +259,11 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
   R --slave -e 'BiocManager::install("UCell")'
   R --slave -e 'BiocManager::install("batchelor")'
+  R --slave -e 'BiocManager::install("TOAST")'
+  R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
+  R --slave -e 'BiocManager::install("BuenColors")'
+  R --slave -e 'BiocManager::install("Rmpfr")'
+
   
   # install packages via github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
@@ -267,13 +280,23 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
   R --slave -e 'devtools::install_github("satijalab/seurat-data")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
+  R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
+  R --slave -e 'ArchR::installExtraPackages()'
+  R --slave -e 'devtools::install_github("xuranw/MuSiC")'
+  R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
+  R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
+
+  # spatial transcriptomics
+  R --slave -e 'remotes::install_github("ludvigla/semla")'
 
   # update Seurat  
-  R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "seurat5")'
-  R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
-  R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "develop")'
+  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
+  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  # redo to make sure signac integration works
+  R --slave -e 'install.packages("irlba")'
   
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
@@ -291,4 +314,3 @@ From: ubuntu:20.04
 
   # remove the Renviron containing my info as well
   # rm .Renviron
-
