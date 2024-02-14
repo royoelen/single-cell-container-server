@@ -83,7 +83,8 @@ From: ubuntu:20.04
     default-jdk \
     libgmp3-dev \
     libmagick++-dev \
-    libtool
+    libtool \
+    libglpk-dev
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -196,9 +197,10 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # set github tokens
-  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
+  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail")'
   
   # go on with installation of CRAN packages
+  R --slave -e 'install.packages("igraph")'
   R --slave -e 'install.packages("R.utils")'
   R --slave -e 'install.packages("optparse")'
   R --slave -e 'install.packages("reshape2")'

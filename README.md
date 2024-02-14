@@ -19,7 +19,8 @@ https://docs.sylabs.io/guides/3.2/user-guide/installation.html#setup
 ## Deploy
 
 Work is being done on supplying automated builds of the image, but for now it can be found on Google Drive
-https://drive.google.com/file/d/1CQ4JgslHsI2o8SqkyZye1Fn7C5KO60bc/view?usp=sharing
+https://drive.google.com/file/d/1Yf5QDw7NKU72h0F0Pf9Ey-zjKfuCI8_T/view?usp=sharing
+
 
 ## Run
 
