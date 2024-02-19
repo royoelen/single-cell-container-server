@@ -197,7 +197,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # set github tokens
-  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail")'
+  R --slave -e 'usethis::use_git_config(user.name = "yourname", user.email = "youremail")'
   
   # go on with installation of CRAN packages
   R --slave -e 'install.packages("igraph")'
@@ -265,6 +265,7 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
   R --slave -e 'BiocManager::install("BuenColors")'
   R --slave -e 'BiocManager::install("Rmpfr")'
+  R --slave -e 'BiocManager::install("glmGamPoi")'
 
   
   # install packages via github
