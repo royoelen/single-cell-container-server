@@ -3,7 +3,7 @@ From: ubuntu:20.04
 
 %labels
   Maintainer Jeremy Nicklas, Roy Oelen
-  RStudio_Version 2023.09.1-494
+  RStudio_Version 2024.04.2-764
 
 %help
   This will run RStudio Server
@@ -27,8 +27,8 @@ From: ubuntu:20.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2023.09.1-494
-  export R_VERSION=4.3.2
+  export RSTUDIO_VERSION=2024.04.2-764
+  export R_VERSION=4.4.1
 
   # Get dependencies
   apt-get update
@@ -137,7 +137,7 @@ From: ubuntu:20.04
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2023.09-0-Linux-x86_64
+  export CONDA_VERSION=Anaconda3-2024.06-1-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
@@ -181,6 +181,11 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/python setup.py install
   cd
 
+  # setup github
+  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
+  R --slave -e 'credentials::set_github_pat("yourpat")'
+  cat "GITHUB_PAT=yourpat" >> .Renviron
+
   # install r packages
   R --slave -e 'install.packages("devtools")'
   R --slave -e 'install.packages("BiocManager")'
@@ -217,7 +222,6 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
-  R --slave -e 'install.packages("ggdendro")'
 
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
@@ -258,6 +262,9 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="dev", repos = BiocManager::repositories())'
   R --slave -e 'devtools::install_github("MarioniLab/miloR", ref="devel")'
   R --slave -e 'devtools::install_github("korsunskylab/rcna")'
+  R --slave -e 'devtools::install_github("https://github.com/royoelen/roycols")'
+  R --slave -e 'devtools::install_github("https://github.com/royoelen/mdfiver")'
+  R --slave -e 'remotes::install_github("cvarrichio/Matrix.utils")'
 
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
@@ -268,3 +275,4 @@ From: ubuntu:20.04
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
+
