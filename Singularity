@@ -154,9 +154,9 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install -c anaconda seaborn
   /opt/anaconda3/bin/conda install -c bioconda scanpy
   /opt/anaconda3/bin/conda install -c conda-forge jupyterlab
-  /opt/anaconda3/bin/conda install -c conda-forge tensorflow
+  #/opt/anaconda3/bin/conda install -c conda-forge tensorflow
   /opt/anaconda3/bin/conda install pip
-  /opt/anaconda3/bin/pip install scCODA
+  #/opt/anaconda3/bin/pip install scCODA
   # patch macs2
   #wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
   #tar -xvf MACS.tar.gz
@@ -166,22 +166,23 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/pip install macs3
   cd
   # and one from source
-  export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-  git clone https://github.com/aertslab/scenicplus
-  cd scenicplus
-  /opt/anaconda3/bin/pip install -e .
-  cd
+  #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+  #git clone https://github.com/aertslab/scenicplus
+  #cd scenicplus
+  #/opt/anaconda3/bin/pip install -e .
+  #cd
   # install new version of tensorflow with pip
-  /opt/anaconda3/bin/pip install tensorflow
+  #/opt/anaconda3/bin/pip install tensorflow
   # pascalX
-  git clone https://github.com/BergmannLab/PascalX.git
-  cd PascalX
-  make all
-  cd python
-  /opt/anaconda3/bin/python setup.py install
-  cd
+  #git clone https://github.com/BergmannLab/PascalX.git
+  #cd PascalX
+  #make all
+  #cd python
+  #/opt/anaconda3/bin/python setup.py install
+  #cd
 
   # setup github
+  R --slave -e 'install.packages("usethis")'
   R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
   R --slave -e 'credentials::set_github_pat("yourpat")'
   cat "GITHUB_PAT=yourpat" >> .Renviron
