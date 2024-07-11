@@ -163,8 +163,8 @@ From: ubuntu:20.04
   #cd MACS-2.2.7.1
   #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
   #/opt/anaconda3/bin/pip install -e .
-  /opt/anaconda3/bin/pip install macs3
-  cd
+  #/opt/anaconda3/bin/pip install macs3
+  #cd
   # and one from source
   #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
   #git clone https://github.com/aertslab/scenicplus
@@ -182,10 +182,10 @@ From: ubuntu:20.04
   #cd
 
   # setup github
+  echo "GITHUB_PAT=your_path" >> .Renviron
   R --slave -e 'install.packages("usethis")'
-  R --slave -e 'usethis::use_git_config(user.name = "royoelen", user.email = "roy.oelen@gmail.com")'
-  R --slave -e 'credentials::set_github_pat("yourpat")'
-  cat "GITHUB_PAT=yourpat" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail@mail.com")'
+  
 
   # install r packages
   R --slave -e 'install.packages("devtools")'
@@ -259,7 +259,7 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
   R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
-  R --slave -e 'devtools::install_github("jrs95/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)'
+  #R --slave -e 'devtools::install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)'
   R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="dev", repos = BiocManager::repositories())'
   R --slave -e 'devtools::install_github("MarioniLab/miloR", ref="devel")'
   R --slave -e 'devtools::install_github("korsunskylab/rcna")'
