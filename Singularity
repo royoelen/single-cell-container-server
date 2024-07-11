@@ -163,7 +163,7 @@ From: ubuntu:20.04
   #cd MACS-2.2.7.1
   #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
   #/opt/anaconda3/bin/pip install -e .
-  #/opt/anaconda3/bin/pip install macs3
+  /opt/anaconda3/bin/pip install macs3
   #cd
   # and one from source
   #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
