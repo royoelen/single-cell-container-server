@@ -196,8 +196,8 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  echo "GITHUB_PAT=your_path" >> .Renviron
-  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "your.address@mail.com")'
+  echo "GITHUB_PAT=yourpat" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail@mail.com")'
   
 
   # install r packages via CRAN
@@ -293,6 +293,9 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
   R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
   R --slave -e 'remotes::install_github("ludvigla/semla")'
+  # small utility functions I developed
+  R --slave -e 'devtools::install_github("royoelen/roycols")'
+  R --slave -e 'devtools::install_github("royoelen/mdfiver")'
   
   # redo to make sure signac integration works
   R --slave -e 'install.packages("irlba")'
