@@ -85,7 +85,8 @@ From: ubuntu:20.04
     libgmp3-dev \
     libmagick++-dev \
     libtool \
-    libglpk-dev
+    libglpk-dev \
+    pandoc
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -196,8 +197,8 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  echo "GITHUB_PAT=yourpat" >> .Renviron
-  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail@mail.com")'
+  echo "GITHUB_PAT=your_path" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "your.email@mail.com")'
   
 
   # install r packages via CRAN
@@ -236,6 +237,10 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
   R --slave -e 'install.packages("statmod")'
+  R --slave -e 'install.packages("textTinyR")'
+  R --slave -e 'install.packages("pandoc")'
+  R --slave -e 'install.packages("Signac")'
+  R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
@@ -266,6 +271,8 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("BuenColors")'
   R --slave -e 'BiocManager::install("Rmpfr")'
   R --slave -e 'BiocManager::install("glmGamPoi")'
+  R --slave -e 'BiocManager::install("snpStats")'
+
 
   # install packages from github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
@@ -293,9 +300,12 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
   R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
   R --slave -e 'remotes::install_github("ludvigla/semla")'
-  # small utility functions I developed
-  R --slave -e 'devtools::install_github("royoelen/roycols")'
-  R --slave -e 'devtools::install_github("royoelen/mdfiver")'
+  R --slave -e 'remotes::install_github("chr1swallace/coloc@main",build_vignettes=TRUE)'
+  R --slave -e 'devtools::install_github("BIGslu/BIGpicture")'
+  R --slave -e 'devtools::install_github("BIGslu/kimma")'
+  R --slave -e 'devtools::install_github("BIGslu/RNAetc")'
+  R --slave -e 'devtools::install_github("BIGslu/SEARchways")'
+  R --slave -e 'devtools::install_github("BIGslu/BIGverse")'
   
   # redo to make sure signac integration works
   R --slave -e 'install.packages("irlba")'
