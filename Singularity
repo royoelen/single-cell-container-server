@@ -3,7 +3,7 @@ From: ubuntu:20.04
 
 %labels
   Maintainer Jeremy Nicklas, Roy Oelen
-  RStudio_Version 2023.12.1-402
+  RStudio_Version 2024.04.2-764
 
 %help
   This will run RStudio Server
@@ -27,12 +27,11 @@ From: ubuntu:20.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2023.12.1-402
+  export RSTUDIO_VERSION=2024.04.2-764
+  export R_VERSION=4.4.1
 
   # Get dependencies
   apt-get update
-  apt-get upgrade -y
-  apt-get update --fix-missing
   apt-get install -y --no-install-recommends \
     locales
 
@@ -81,10 +80,13 @@ From: ubuntu:20.04
     git \
     libgit2-dev \
     default-jdk \
+    libmpfr-dev \
+    curl \
     libgmp3-dev \
     libmagick++-dev \
     libtool \
-    libglpk-dev
+    libglpk-dev \
+    pandoc
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
@@ -141,7 +143,7 @@ From: ubuntu:20.04
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2022.10-Linux-x86_64
+  export CONDA_VERSION=Anaconda3-2024.06-1-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
@@ -158,21 +160,22 @@ From: ubuntu:20.04
   /opt/anaconda3/bin/conda install -c anaconda seaborn
   /opt/anaconda3/bin/conda install -c bioconda scanpy
   /opt/anaconda3/bin/conda install -c conda-forge jupyterlab
-  /opt/anaconda3/bin/conda install -c conda-forge tensorflow
+  #/opt/anaconda3/bin/conda install -c conda-forge tensorflow
   /opt/anaconda3/bin/conda install pip
-  /opt/anaconda3/bin/pip install scCODA
+  #/opt/anaconda3/bin/pip install scCODA
   # patch macs2
   #wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
   #tar -xvf MACS.tar.gz
   #cd MACS-2.2.7.1
   #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
-  # /opt/anaconda3/bin/pip install -e .
+  #/opt/anaconda3/bin/pip install -e .
+  /opt/anaconda3/bin/pip install macs3
   #cd
   # and one from source
   #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
   #git clone https://github.com/aertslab/scenicplus
   #cd scenicplus
-  # /opt/anaconda3/bin/pip install -e .
+  #/opt/anaconda3/bin/pip install -e .
   #cd
   # install new version of tensorflow with pip
   #/opt/anaconda3/bin/pip install tensorflow
@@ -187,19 +190,18 @@ From: ubuntu:20.04
   # copy pandoc libraries
   ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
 
-  # set github access token
-  echo 'GITHUB_PAT="yourpat"' >> .Renviron
-
-  # install r packages
+  # setup package managers
   R --slave -e 'install.packages("gert")'
   R --slave -e 'install.packages("usethis")'
   R --slave -e 'install.packages("devtools")'
   R --slave -e 'install.packages("BiocManager")'
 
-  # set github tokens
-  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "youremail")'
+  # setup github
+  echo "GITHUB_PAT=your_path" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "your.email@mail.com")'
   
-  # go on with installation of CRAN packages
+
+  # install r packages via CRAN
   R --slave -e 'install.packages("igraph")'
   R --slave -e 'install.packages("R.utils")'
   R --slave -e 'install.packages("optparse")'
@@ -234,12 +236,15 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("xlsx")'
   R --slave -e 'install.packages("openxlsx")'
   R --slave -e 'install.packages("scatteR")'
-  R --slave -e 'install.packages("statmod")'  
-
-  # manually install package that has been removed from CRAN
+  R --slave -e 'install.packages("statmod")'
+  R --slave -e 'install.packages("textTinyR")'
+  R --slave -e 'install.packages("pandoc")'
+  R --slave -e 'install.packages("Signac")'
+  R --slave -e 'pandoc::pandoc_install()'
+  # deprecated package
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
-  # install packages from BioConductor
+  # install bioconductor packages
   R --slave -e 'BiocManager::install("MAST")'
   R --slave -e 'BiocManager::install("variancePartition")'
   R --slave -e 'BiocManager::install("edgeR")'
@@ -265,9 +270,11 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
   R --slave -e 'BiocManager::install("BuenColors")'
   R --slave -e 'BiocManager::install("Rmpfr")'
+  R --slave -e 'BiocManager::install("glmGamPoi")'
+  R --slave -e 'BiocManager::install("snpStats")'
 
-  
-  # install packages via github
+
+  # install packages from github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
   R --slave -e 'devtools::install_github("sqjin/CellChat")'
   R --slave -e 'devtools::install_github("saeyslab/nichenetr")'
@@ -282,24 +289,31 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
   R --slave -e 'devtools::install_github("satijalab/seurat-data")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="master", repos = BiocManager::repositories())'
+  #R --slave -e 'devtools::install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)'
+  R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="dev", repos = BiocManager::repositories())'
+  R --slave -e 'devtools::install_github("MarioniLab/miloR", ref="devel")'
+  R --slave -e 'devtools::install_github("korsunskylab/rcna")'
+  R --slave -e 'devtools::install_github("https://github.com/royoelen/roycols")'
+  R --slave -e 'devtools::install_github("https://github.com/royoelen/mdfiver")'
+  R --slave -e 'remotes::install_github("cvarrichio/Matrix.utils")'
   R --slave -e 'ArchR::installExtraPackages()'
   R --slave -e 'devtools::install_github("xuranw/MuSiC")'
   R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
-  R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
-
-  # spatial transcriptomics
   R --slave -e 'remotes::install_github("ludvigla/semla")'
-
-  # update Seurat  
-  #R --slave -e 'devtools::install_github("satijalab/seurat", ref = "seurat5")'
-  R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  R --slave -e 'devtools::install_github("stuart-lab/signac", ref = "develop")'
-  #R --slave -e 'devtools::install_github("satijalab/azimuth", ref = "seurat5")'
-  #R --slave -e 'devtools::install_github("satijalab/seurat-wrappers", ref = "seurat5")'
+  R --slave -e 'remotes::install_github("chr1swallace/coloc@main",build_vignettes=TRUE)'
+  R --slave -e 'devtools::install_github("BIGslu/BIGpicture")'
+  R --slave -e 'devtools::install_github("BIGslu/kimma")'
+  R --slave -e 'devtools::install_github("BIGslu/RNAetc")'
+  R --slave -e 'devtools::install_github("BIGslu/SEARchways")'
+  R --slave -e 'devtools::install_github("BIGslu/BIGverse")'
+  
   # redo to make sure signac integration works
   R --slave -e 'install.packages("irlba")'
-  
+
+  # this library is a bit problematic
+  export CFLAGS='-mssse3'
+  R --slave -e 'remotes::install_github("bnprks/BPCells/r")'
+
   # manual stuff
   wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
   tar -xf rpux_0.7.2_linux.tar.gz
@@ -307,12 +321,6 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("rpud_0.7.2.tar.gz")'
   R --slave -e 'install.packages("rpudplus_0.7.2.tar.gz")'
 
-  # this library is a bit problematic
-  export CFLAGS='-mssse3'
-  R --slave -e 'devtools::install_github("bnprks/BPCells")'
-
   # Clean up
   rm -rf /var/lib/apt/lists/*
 
-  # remove the Renviron containing my info as well
-  # rm .Renviron
