@@ -197,7 +197,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  echo "GITHUB_PAT=your_path" >> .Renviron
+  echo "GITHUB_PAT=your_pat" >> .Renviron
   R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "your.email@mail.com")'
   
 
@@ -240,6 +240,7 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("textTinyR")'
   R --slave -e 'install.packages("pandoc")'
   R --slave -e 'install.packages("Signac")'
+  R --slave -e 'install.packages("OlinkAnalyze")'
   R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -313,13 +314,6 @@ From: ubuntu:20.04
   # this library is a bit problematic
   export CFLAGS='-mssse3'
   R --slave -e 'remotes::install_github("bnprks/BPCells/r")'
-
-  # manual stuff
-  wget https://www.r-tutor.com/sites/default/files/rpud/rpux_0.7.2_linux.tar.gz
-  tar -xf rpux_0.7.2_linux.tar.gz
-  cd rpux_0.7.2_linux
-  R --slave -e 'install.packages("rpud_0.7.2.tar.gz")'
-  R --slave -e 'install.packages("rpudplus_0.7.2.tar.gz")'
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
