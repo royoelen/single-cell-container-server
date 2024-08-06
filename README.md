@@ -157,7 +157,7 @@ screen -S rserver
 
 request the amount of resources you think you need, and be sure to ask for temporary storage
 ```sh
-srun --cpus-per-task=8 --mem=64gb --nodes=1 --qos=priority --time=23:59:59 --job-name=rstudio_server --tmp=10GB --pty bash -i
+srun --cpus-per-task=4 --mem=64gb --nodes=1 --qos=priority --time=23:59:59 --job-name=rstudio_server --tmp=10GB --pty bash -i
 ```
 
 once you get your session, check if the port in your *start_server_computenode.sh* file is available
