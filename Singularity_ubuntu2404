@@ -31,9 +31,9 @@ From: ubuntu:24.04
   export R_VERSION=4.4.2
 
   # build necessities
-  export PAT='personalaccesstoken'
-  export EMAIL='email@email.com'
-  export USERNAME='username'
+  export PAT='yourpat'
+  export EMAIL='youremail'
+  export USERNAME='yourusuer'
 
   # Get dependencies
   apt-get update
@@ -128,28 +128,22 @@ From: ubuntu:24.04
   gdebi -n rstudio-server.deb
   rm -f rstudio-server.deb
 
-  # Add support for LDAP authentication
-  wget \
-    --no-verbose \
-    -O get-pip.py \
-    "https://bootstrap.pypa.io/get-pip.py"
-  python3 get-pip.py
-  rm -f get-pip.py
-  pip3 install 'ldap3==2.9'
-  chmod u+r /etc/rstudio/database.conf
-
   # set the server directory to be in /home, because the container is not writeable
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2024.10-1-Windows-x86_64
+  export CONDA_VERSION=Anaconda3-2024.10-1-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
   ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  ln -s /opt/anaconda3/bin/pip /usr/local/bin/pip
+  ln -s /opt/anaconda3/bin/python /usr/local/bin/python
   rm ${CONDA_VERSION}.sh
+  # update conda to the latest version
+  /opt/anaconda3/bin/conda update -n base -c anaconda conda
   # install python
-  /opt/anaconda3/bin/conda install -c anaconda python==3.12
+  /opt/anaconda3/bin/conda install -c anaconda python==3.11
   # install python tools
   /opt/anaconda3/bin/conda config --add channels defaults
   /opt/anaconda3/bin/conda config --add channels bioconda
@@ -164,8 +158,15 @@ From: ubuntu:24.04
   #/opt/anaconda3/bin/conda install -c conda-forge tensorflow
   /opt/anaconda3/bin/conda install pip
   #/opt/anaconda3/bin/pip install scCODA
-  # patch macs2
-  /opt/anaconda3/bin/pip install macs2
+  # install macs2
+  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.9.1.tar.gz
+  tar -xvzf v2.2.9.1.tar.gz
+  cd MACS-2.2.9.1/
+  # patch
+  #sed -i 's/tstate->use_tracing/tstate->tracing/g' MACS2/Prob.c
+  /opt/anaconda3/bin/pip install .
+  cd
+  # install macs3
   /opt/anaconda3/bin/pip install macs3
   # install scenic plus
   git clone https://github.com/aertslab/scenicplus
@@ -173,6 +174,10 @@ From: ubuntu:24.04
   git checkout development
   /opt/anaconda3/bin/pip install .
   cd
+
+  # Add support for LDAP authentication
+  /opt/anaconda3/bin/pip install 'ldap3==2.9'
+  chmod u+r /etc/rstudio/database.conf
 
   # copy pandoc libraries
   ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
