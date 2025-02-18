@@ -1,5 +1,5 @@
 BootStrap: docker
-From: ubuntu:20.04
+From: ubuntu:24.04
 
 %labels
   Maintainer Jeremy Nicklas, Roy Oelen
@@ -27,8 +27,13 @@ From: ubuntu:20.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2024.04.2-764
-  export R_VERSION=4.4.1
+  export RSTUDIO_VERSION=2024.12.0-467
+  export R_VERSION=4.4.2
+
+  # build necessities
+  export PAT='your_path'
+  export EMAIL='your.name@mail.com'
+  export USERNAME='yourname'
 
   # Get dependencies
   apt-get update
@@ -94,20 +99,14 @@ From: ubuntu:20.04
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
   export DEBIAN_FRONTEND=noninteractive
-  # install CUDA 11
-  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-ubuntu2004.pin
-  mv cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
-  wget https://developer.download.nvidia.com/compute/cuda/11.8.0/local_installers/cuda-repo-ubuntu2004-11-8-local_11.8.0-520.61.05-1_amd64.deb
-  dpkg -i cuda-repo-ubuntu2004-11-8-local_11.8.0-520.61.05-1_amd64.deb
-  cp /var/cuda-repo-ubuntu2004-11-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  # install latest CUDA
+  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+  mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
   apt-get update
-  apt-get -y install cuda-11-8
-  # now latest CUDA
-  wget https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
-  dpkg -i cuda-repo-ubuntu2004-12-1-local_12.1.0-530.30.02-1_amd64.deb
-  cp /var/cuda-repo-ubuntu2004-12-1-local/cuda-*-keyring.gpg /usr/share/keyrings/
-  apt-get update
-  apt-get -y install cuda
+  apt-get -y install cuda-toolkit-12-8
 
   # Add a default CRAN mirror
   echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/lib/R/etc/Rprofile.site
@@ -125,30 +124,26 @@ From: ubuntu:20.04
   wget \
     --no-verbose \
     -O rstudio-server.deb \
-    "https://download2.rstudio.org/server/focal/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb"
+    "https://download2.rstudio.org/server/jammy/amd64/rstudio-server-${RSTUDIO_VERSION}-amd64.deb"
   gdebi -n rstudio-server.deb
   rm -f rstudio-server.deb
-
-  # Add support for LDAP authentication
-  wget \
-    --no-verbose \
-    -O get-pip.py \
-    "https://bootstrap.pypa.io/get-pip.py"
-  python3 get-pip.py
-  rm -f get-pip.py
-  pip3 install 'ldap3==2.9'
-  chmod u+r /etc/rstudio/database.conf
 
   # set the server directory to be in /home, because the container is not writeable
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2024.06-1-Linux-x86_64
+  export CONDA_VERSION=Anaconda3-2024.10-1-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
   ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  ln -s /opt/anaconda3/bin/pip /usr/local/bin/pip
+  ln -s /opt/anaconda3/bin/python /usr/local/bin/python
   rm ${CONDA_VERSION}.sh
+  # update conda to the latest version
+  /opt/anaconda3/bin/conda update -n base -c anaconda conda
+  # install python
+  /opt/anaconda3/bin/conda install -c anaconda python==3.11
   # install python tools
   /opt/anaconda3/bin/conda config --add channels defaults
   /opt/anaconda3/bin/conda config --add channels bioconda
@@ -163,29 +158,26 @@ From: ubuntu:20.04
   #/opt/anaconda3/bin/conda install -c conda-forge tensorflow
   /opt/anaconda3/bin/conda install pip
   #/opt/anaconda3/bin/pip install scCODA
-  # patch macs2
-  #wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.7.1.tar.gz -O MACS.tar.gz
-  #tar -xvf MACS.tar.gz
-  #cd MACS-2.2.7.1
-  #sed -i 's/install_requires = \[f"numpy>={numpy_requires}",\]/install_requires = \[f"numpy{numpy_requires}",\]/' setup.py
-  #/opt/anaconda3/bin/pip install -e .
+  # install macs2
+  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.9.1.tar.gz
+  tar -xvzf v2.2.9.1.tar.gz
+  cd MACS-2.2.9.1/
+  # patch
+  #sed -i 's/tstate->use_tracing/tstate->tracing/g' MACS2/Prob.c
+  /opt/anaconda3/bin/pip install .
+  cd
+  # install macs3
   /opt/anaconda3/bin/pip install macs3
-  #cd
-  # and one from source
-  #export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
-  #git clone https://github.com/aertslab/scenicplus
-  #cd scenicplus
-  #/opt/anaconda3/bin/pip install -e .
-  #cd
-  # install new version of tensorflow with pip
-  #/opt/anaconda3/bin/pip install tensorflow
-  # pascalX
-  #git clone https://github.com/BergmannLab/PascalX.git
-  #cd PascalX
-  #make all
-  #cd python
-  #/opt/anaconda3/bin/python setup.py install
-  #cd
+  # install scenic plus
+  git clone https://github.com/aertslab/scenicplus
+  cd scenicplus
+  git checkout development
+  /opt/anaconda3/bin/pip install .
+  cd
+
+  # Add support for LDAP authentication
+  /opt/anaconda3/bin/pip install 'ldap3==2.9'
+  chmod u+r /etc/rstudio/database.conf
 
   # copy pandoc libraries
   ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin
@@ -197,8 +189,8 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  echo "GITHUB_PAT=your_pat" >> .Renviron
-  R --slave -e 'usethis::use_git_config(user.name = "yourusername", user.email = "your.email@mail.com")'
+  echo "GITHUB_PAT=${PAT}" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "'${USERNAME}'", user.email = "'${EMAIL}'")'
   
 
   # install r packages via CRAN
@@ -239,8 +231,9 @@ From: ubuntu:20.04
   R --slave -e 'install.packages("statmod")'
   R --slave -e 'install.packages("textTinyR")'
   R --slave -e 'install.packages("pandoc")'
-  R --slave -e 'install.packages("Signac")'
+  R --slave -e 'install.packages("irlba")'
   R --slave -e 'install.packages("OlinkAnalyze")'
+  R --slave -e 'install.packages("fastR")'
   R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -273,7 +266,17 @@ From: ubuntu:20.04
   R --slave -e 'BiocManager::install("Rmpfr")'
   R --slave -e 'BiocManager::install("glmGamPoi")'
   R --slave -e 'BiocManager::install("snpStats")'
+  R --slave -e 'BiocManager::install("rhdf5")'
 
+  # Signac prerequisites
+  R --slave -e 'BiocManager::install("GenomeInfoDb")'
+  R --slave -e 'BiocManager::install("GenomicRanges")'
+  R --slave -e 'BiocManager::install("IRanges")'
+  R --slave -e 'BiocManager::install("Rsamtools")'
+  R --slave -e 'BiocManager::install("S4Vectors")'
+  R --slave -e 'BiocManager::install("BiocGenerics")'
+  # then signac
+  R --slave -e 'install.packages("Signac")'
 
   # install packages from github
   R --slave -e 'devtools::install_github("immunogenomics/harmony")'
@@ -307,9 +310,7 @@ From: ubuntu:20.04
   R --slave -e 'devtools::install_github("BIGslu/RNAetc")'
   R --slave -e 'devtools::install_github("BIGslu/SEARchways")'
   R --slave -e 'devtools::install_github("BIGslu/BIGverse")'
-  
-  # redo to make sure signac integration works
-  R --slave -e 'install.packages("irlba")'
+  R --slave -e 'devtools::install_github("https://github.com/molgenis/ReigenMT")'
 
   # this library is a bit problematic
   export CFLAGS='-mssse3'
