@@ -2,8 +2,11 @@ BootStrap: docker
 From: ubuntu:24.04
 
 %labels
-  Maintainer Jeremy Nicklas, Roy Oelen
-  RStudio_Version 2024.04.2-764
+  Maintainer Roy Oelen (roy.oelen@gmail.com)
+  RStudio_Version 2024.12.0-467
+  R_Version 4.4.2
+  Image_Version v2.0.1
+  Repository https://github.com/royoelen/single-cell-container-server
 
 %help
   This will run RStudio Server
@@ -31,9 +34,9 @@ From: ubuntu:24.04
   export R_VERSION=4.4.2
 
   # build necessities
-  export PAT='your_path'
-  export EMAIL='your.name@mail.com'
-  export USERNAME='yourname'
+  export PAT='yourpat'
+  export EMAIL='youremail@email.com'
+  export USERNAME='yourusername'
 
   # Get dependencies
   apt-get update
@@ -234,6 +237,9 @@ From: ubuntu:24.04
   R --slave -e 'install.packages("irlba")'
   R --slave -e 'install.packages("OlinkAnalyze")'
   R --slave -e 'install.packages("fastR")'
+  R --slave -e 'install.packages("meta")'
+  R --slave -e 'install.packages("bestNormalize")'
+
   R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
   R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
@@ -267,6 +273,10 @@ From: ubuntu:24.04
   R --slave -e 'BiocManager::install("glmGamPoi")'
   R --slave -e 'BiocManager::install("snpStats")'
   R --slave -e 'BiocManager::install("rhdf5")'
+  R --slave -e 'BiocManager::install("Rfast")'
+  R --slave -e 'BiocManager::install("chromVAR")'
+  R --slave -e 'BiocManager::install("motifmatchr")'
+  R --slave -e 'BiocManager::install("TFBSTools")'
 
   # Signac prerequisites
   R --slave -e 'BiocManager::install("GenomeInfoDb")'
@@ -290,6 +300,7 @@ From: ubuntu:24.04
   R --slave -e 'devtools::install_github("powellgenomicslab/scPred")'
   R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
   R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
+  R --slave -e 'devtools::install_github("caleblareau/BuenColors")'
   R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
   R --slave -e 'devtools::install_github("satijalab/seurat-data")'
   R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
