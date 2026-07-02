@@ -33,6 +33,12 @@ From: ubuntu:26.04
   export RSTUDIO_VERSION=2026.06.0-242
   export R_VERSION=4.6.1
 
+  # set non-interactive
+  export DEBIAN_FRONTEND=noninteractive
+  # install date dependencies
+  apt-get update
+  apt-get install -y tzdata
+
   # build necessities
   # export PAT='yourpat'
   # export EMAIL='youremail@mail.com'
@@ -101,7 +107,7 @@ From: ubuntu:26.04
 
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
-  export DEBIAN_FRONTEND=noninteractive
+  # export DEBIAN_FRONTEND=noninteractive
   # # install latest CUDA
   # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
   # mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
@@ -139,12 +145,15 @@ From: ubuntu:26.04
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
-  ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  ln -s /opt/anaconda3/bin/conda /usr/local/bin/conda
   ln -s /opt/anaconda3/bin/pip /usr/local/bin/pip
   ln -s /opt/anaconda3/bin/python /usr/local/bin/python
   rm ${CONDA_VERSION}.sh
+  # accept TOS
+  /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+  /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
   # update conda to the latest version
-  /opt/anaconda3/bin/conda update -n base -c anaconda conda
+  /opt/anaconda3/bin/conda update -y -n base -c anaconda conda
   # install python
   /opt/anaconda3/bin/conda install -c anaconda python==3.11
   # install python tools
