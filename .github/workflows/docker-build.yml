@@ -2,7 +2,7 @@ name: Build and Push to GitLab Registry
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   build:
