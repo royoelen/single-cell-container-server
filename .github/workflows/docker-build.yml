@@ -1,0 +1,27 @@
+name: Build and Push to GitLab Registry
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to GitLab Container Registry
+        run: |
+          echo "${{ secrets.GH_SCCS_REGISTRY_TOKEN_T1 }}" | \
+          docker login registry.gitlab.com \
+            -u "${{ secrets.GH_SCCS_REGISTRY_USER }}" \
+            --password-stdin
+
+      - name: Build Docker image
+        run: |
+          docker build -t registry.gitlab.com/royoelen/single-cell-container-server:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push registry.gitlab.com/royoelen/single-cell-container-server:latest
