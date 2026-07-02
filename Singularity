@@ -1,11 +1,11 @@
 BootStrap: docker
-From: ubuntu:24.04
+From: ubuntu:26.04
 
 %labels
   Maintainer Roy Oelen (roy.oelen@gmail.com)
-  RStudio_Version 2025.05.1-513
-  R_Version 4.5.1
-  Image_Version v2.0.2-bare
+  RStudio_Version 2026.06.0-242
+  R_Version 4.6.1
+  Image_Version v2.1
   Repository https://github.com/royoelen/single-cell-container-server
 
 %help
@@ -30,13 +30,13 @@ From: ubuntu:24.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2025.05.1-513
-  export R_VERSION=4.5.1
+  export RSTUDIO_VERSION=2026.06.0-242
+  export R_VERSION=4.6.1
 
   # build necessities
-  export PAT='yourpat'
-  export EMAIL='youremail@mail.com'
-  export USERNAME='yourusername'
+  # export PAT='yourpat'
+  # export EMAIL='youremail@mail.com'
+  # export USERNAME='yourusername'
 
   # Get dependencies
   apt-get update
@@ -102,14 +102,14 @@ From: ubuntu:24.04
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
   export DEBIAN_FRONTEND=noninteractive
-  # install latest CUDA
-  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
-  mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-  wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-  dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-  cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
-  apt-get update
-  apt-get -y install cuda-toolkit-12-8
+  # # install latest CUDA
+  # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+  # mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  # wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  # dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  # cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  # apt-get update
+  # apt-get -y install cuda-toolkit-12-8
 
   # Add a default CRAN mirror
   echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/lib/R/etc/Rprofile.site
@@ -135,7 +135,7 @@ From: ubuntu:24.04
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2024.10-1-Linux-x86_64
+  export CONDA_VERSION=Anaconda3-2025.12-2-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
@@ -162,9 +162,9 @@ From: ubuntu:24.04
   /opt/anaconda3/bin/conda install pip
   #/opt/anaconda3/bin/pip install scCODA
   # install macs2
-  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.9.1.tar.gz
-  tar -xvzf v2.2.9.1.tar.gz
-  cd MACS-2.2.9.1/
+  wget https://github.com/macs3-project/MACS/archive/refs/tags/v3.0.4.tar.gz
+  tar -xvzf MACS-3.0.4.tar.gz
+  cd MACS-3.0.4/
   # patch
   #sed -i 's/tstate->use_tracing/tstate->tracing/g' MACS2/Prob.c
   /opt/anaconda3/bin/pip install .
@@ -192,102 +192,102 @@ From: ubuntu:24.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  echo "GITHUB_PAT=${PAT}" >> .Renviron
-  R --slave -e 'usethis::use_git_config(user.name = "'${USERNAME}'", user.email = "'${EMAIL}'")'
+  # echo "GITHUB_PAT=${PAT}" >> .Renviron
+  # R --slave -e 'usethis::use_git_config(user.name = "'${USERNAME}'", user.email = "'${EMAIL}'")'
   
 
   # install r packages via CRAN
-  # R --slave -e 'install.packages("igraph")'
-  # R --slave -e 'install.packages("R.utils")'
-  # R --slave -e 'install.packages("optparse")'
-  # R --slave -e 'install.packages("reshape2")'
-  # R --slave -e 'install.packages("plyr")'
-  # R --slave -e 'install.packages("dplyr")'
-  # R --slave -e 'install.packages("ggridges")'
-  # R --slave -e 'install.packages("Seurat")'
-  # R --slave -e 'install.packages("MatrixEQTL")'
-  # R --slave -e 'install.packages("mlrMBO")'
-  # R --slave -e 'install.packages("circlize")'
-  # R --slave -e 'install.packages("vcfR")'
-  # R --slave -e 'install.packages("hexbin")'
-  # R --slave -e 'install.packages("cowplot")'
-  # R --slave -e 'install.packages("tidyverse")'
-  # R --slave -e 'install.packages("ggnewscale")'
-  # R --slave -e 'install.packages("enrichR")'
-  # R --slave -e 'install.packages("hexbin")'
-  # R --slave -e 'install.packages("ggpubr")'
-  # R --slave -e 'install.packages("rmarkdown", dep = TRUE)'
-  # R --slave -e 'install.packages("ggvenn")'
-  # R --slave -e 'install.packages("fido")'
-  # R --slave -e 'install.packages("UpSetR")'
-  # R --slave -e 'install.packages("sctransform")'
-  # R --slave -e 'install.packages("compositions")'
-  # R --slave -e 'install.packages("lmerTest")'
-  # R --slave -e 'install.packages("nlme")'
-  # R --slave -e 'install.packages("lme4")'
-  # R --slave -e 'install.packages("optparse")'
-  # R --slave -e 'install.packages("MASS")'
-  # R --slave -e 'install.packages("networkD3")'
-  # R --slave -e 'install.packages("xlsx")'
-  # R --slave -e 'install.packages("openxlsx")'
-  # R --slave -e 'install.packages("scatteR")'
-  # R --slave -e 'install.packages("statmod")'
-  # R --slave -e 'install.packages("textTinyR")'
-  # R --slave -e 'install.packages("pandoc")'
-  # R --slave -e 'install.packages("irlba")'
-  # R --slave -e 'install.packages("OlinkAnalyze")'
-  # R --slave -e 'install.packages("fastR")'
-  # R --slave -e 'install.packages("meta")'
-  # R --slave -e 'install.packages("bestNormalize")'
-  # R --slave -e 'install.packages("svMisc")'
+  R --slave -e 'install.packages("igraph")'
+  R --slave -e 'install.packages("R.utils")'
+  R --slave -e 'install.packages("optparse")'
+  R --slave -e 'install.packages("reshape2")'
+  R --slave -e 'install.packages("plyr")'
+  R --slave -e 'install.packages("dplyr")'
+  R --slave -e 'install.packages("ggridges")'
+  R --slave -e 'install.packages("Seurat")'
+  R --slave -e 'install.packages("MatrixEQTL")'
+  R --slave -e 'install.packages("mlrMBO")'
+  R --slave -e 'install.packages("circlize")'
+  R --slave -e 'install.packages("vcfR")'
+  R --slave -e 'install.packages("hexbin")'
+  R --slave -e 'install.packages("cowplot")'
+  R --slave -e 'install.packages("tidyverse")'
+  R --slave -e 'install.packages("ggnewscale")'
+  R --slave -e 'install.packages("enrichR")'
+  R --slave -e 'install.packages("hexbin")'
+  R --slave -e 'install.packages("ggpubr")'
+  R --slave -e 'install.packages("rmarkdown", dep = TRUE)'
+  R --slave -e 'install.packages("ggvenn")'
+  R --slave -e 'install.packages("fido")'
+  R --slave -e 'install.packages("UpSetR")'
+  R --slave -e 'install.packages("sctransform")'
+  R --slave -e 'install.packages("compositions")'
+  R --slave -e 'install.packages("lmerTest")'
+  R --slave -e 'install.packages("nlme")'
+  R --slave -e 'install.packages("lme4")'
+  R --slave -e 'install.packages("optparse")'
+  R --slave -e 'install.packages("MASS")'
+  R --slave -e 'install.packages("networkD3")'
+  R --slave -e 'install.packages("xlsx")'
+  R --slave -e 'install.packages("openxlsx")'
+  R --slave -e 'install.packages("scatteR")'
+  R --slave -e 'install.packages("statmod")'
+  R --slave -e 'install.packages("textTinyR")'
+  R --slave -e 'install.packages("pandoc")'
+  R --slave -e 'install.packages("irlba")'
+  R --slave -e 'install.packages("OlinkAnalyze")'
+  R --slave -e 'install.packages("fastR")'
+  R --slave -e 'install.packages("meta")'
+  R --slave -e 'install.packages("bestNormalize")'
+  R --slave -e 'install.packages("svMisc")'
 
-  # R --slave -e 'pandoc::pandoc_install()'
-  # # deprecated package
-  # R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
+  R --slave -e 'pandoc::pandoc_install()'
+  # deprecated package
+  R --slave -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/Matrix.utils/Matrix.utils_0.9.8.tar.gz", repos=NULL)'
 
-  # # install bioconductor packages
-  # R --slave -e 'BiocManager::install("MAST")'
-  # R --slave -e 'BiocManager::install("variancePartition")'
-  # R --slave -e 'BiocManager::install("edgeR")'
-  # R --slave -e 'BiocManager::install("BiocParallel")'
-  # R --slave -e 'BiocManager::install("DESeq2")'
-  # R --slave -e 'BiocManager::install("VariantAnnotation")'
-  # R --slave -e 'BiocManager::install("SingleR")'
-  # R --slave -e 'BiocManager::install("OmnipathR")'
-  # R --slave -e 'BiocManager::install("ComplexHeatmap")'
-  # R --slave -e 'BiocManager::install("pcaMethods")'
-  # R --slave -e 'BiocManager::install("clusterProfiler")'
-  # #R --slave -e 'BiocManager::install("organism", character.only = TRUE)'
-  # R --slave -e 'BiocManager::install("organism")'
-  # R --slave -e 'BiocManager::install("enrichplot")'
-  # R --slave -e 'BiocManager::install("pathview")'
-  # R --slave -e 'BiocManager::install("phyloseq")'
-  # R --slave -e 'BiocManager::install("MOFA2")'
-  # R --slave -e 'BiocManager::install("muscat")'
-  # R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
-  # R --slave -e 'BiocManager::install("UCell")'
-  # R --slave -e 'BiocManager::install("batchelor")'
-  # R --slave -e 'BiocManager::install("TOAST")'
-  # R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
-  # R --slave -e 'BiocManager::install("BuenColors")'
-  # R --slave -e 'BiocManager::install("Rmpfr")'
-  # R --slave -e 'BiocManager::install("glmGamPoi")'
-  # R --slave -e 'BiocManager::install("snpStats")'
-  # R --slave -e 'BiocManager::install("rhdf5")'
-  # R --slave -e 'BiocManager::install("Rfast")'
-  # R --slave -e 'BiocManager::install("chromVAR")'
-  # R --slave -e 'BiocManager::install("motifmatchr")'
-  # R --slave -e 'BiocManager::install("TFBSTools")'
+  # install bioconductor packages
+  R --slave -e 'BiocManager::install("MAST")'
+  R --slave -e 'BiocManager::install("variancePartition")'
+  R --slave -e 'BiocManager::install("edgeR")'
+  R --slave -e 'BiocManager::install("BiocParallel")'
+  R --slave -e 'BiocManager::install("DESeq2")'
+  R --slave -e 'BiocManager::install("VariantAnnotation")'
+  R --slave -e 'BiocManager::install("SingleR")'
+  R --slave -e 'BiocManager::install("OmnipathR")'
+  R --slave -e 'BiocManager::install("ComplexHeatmap")'
+  R --slave -e 'BiocManager::install("pcaMethods")'
+  R --slave -e 'BiocManager::install("clusterProfiler")'
+  #R --slave -e 'BiocManager::install("organism", character.only = TRUE)'
+  R --slave -e 'BiocManager::install("organism")'
+  R --slave -e 'BiocManager::install("enrichplot")'
+  R --slave -e 'BiocManager::install("pathview")'
+  R --slave -e 'BiocManager::install("phyloseq")'
+  R --slave -e 'BiocManager::install("MOFA2")'
+  R --slave -e 'BiocManager::install("muscat")'
+  R --slave -e 'BiocManager::install("MetaVolcanoR", eval = FALSE)'
+  R --slave -e 'BiocManager::install("UCell")'
+  R --slave -e 'BiocManager::install("batchelor")'
+  R --slave -e 'BiocManager::install("TOAST")'
+  R --slave -e 'BiocManager::install(c("CellBench", "BiocStyle", "scater"))'
+  R --slave -e 'BiocManager::install("BuenColors")'
+  R --slave -e 'BiocManager::install("Rmpfr")'
+  R --slave -e 'BiocManager::install("glmGamPoi")'
+  R --slave -e 'BiocManager::install("snpStats")'
+  R --slave -e 'BiocManager::install("rhdf5")'
+  R --slave -e 'BiocManager::install("Rfast")'
+  R --slave -e 'BiocManager::install("chromVAR")'
+  R --slave -e 'BiocManager::install("motifmatchr")'
+  R --slave -e 'BiocManager::install("TFBSTools")'
 
-  # # Signac prerequisites
-  # R --slave -e 'BiocManager::install("GenomeInfoDb")'
-  # R --slave -e 'BiocManager::install("GenomicRanges")'
-  # R --slave -e 'BiocManager::install("IRanges")'
-  # R --slave -e 'BiocManager::install("Rsamtools")'
-  # R --slave -e 'BiocManager::install("S4Vectors")'
-  # R --slave -e 'BiocManager::install("BiocGenerics")'
-  # # then signac
-  # R --slave -e 'install.packages("Signac")'
+  # Signac prerequisites
+  R --slave -e 'BiocManager::install("GenomeInfoDb")'
+  R --slave -e 'BiocManager::install("GenomicRanges")'
+  R --slave -e 'BiocManager::install("IRanges")'
+  R --slave -e 'BiocManager::install("Rsamtools")'
+  R --slave -e 'BiocManager::install("S4Vectors")'
+  R --slave -e 'BiocManager::install("BiocGenerics")'
+  # then signac
+  R --slave -e 'install.packages("Signac")'
 
   # # install packages from github
   # R --slave -e 'devtools::install_github("immunogenomics/harmony")'
