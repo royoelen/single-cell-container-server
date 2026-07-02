@@ -13,4 +13,4 @@ jobs:
           git clone --mirror https://github.com/${{ github.repository }}.git repo.git
           cd repo.git
 
-          git push --mirror https://${{ secrets.GH_SCCS_FORWARD_USER }}:${{ secrets.GH_SCCS_FORWARD_TOKEN_T1 }}@gitlab.com/royoelensingle-cell-container-server.git
+          git push --mirror https://${{ secrets.GH_SCCS_FORWARD_USER }}:${{ secrets.GH_SCCS_FORWARD_TOKEN_T1 }}@gitlab.com/royoelen/single-cell-container-server.git
