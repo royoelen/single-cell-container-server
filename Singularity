@@ -40,9 +40,9 @@ From: ubuntu:26.04
   apt-get install -y tzdata
 
   # build necessities
-  # export PAT='yourpat'
-  # export EMAIL='youremail@mail.com'
-  # export USERNAME='yourusername'
+  export PAT='yourpat'
+  export EMAIL='youremail@mail.com'
+  export USERNAME='yourusername'
 
   # Get dependencies
   apt-get update
@@ -86,6 +86,7 @@ From: ubuntu:26.04
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
+    libuv1-dev \
     cmake \
     make \
     g++ \
@@ -104,6 +105,8 @@ From: ubuntu:26.04
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
+  apt-get install -y gzip less
+  apt-get install -y default-jdk
 
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
@@ -152,14 +155,19 @@ From: ubuntu:26.04
   # accept TOS
   /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
   /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+  export CONDA_PLUGINS_AUTO_ACCEPT_TOS=yes
   # update conda to the latest version
   /opt/anaconda3/bin/conda update -y -n base -c anaconda conda
+  # install micromamb
+  /opt/anaconda3/bin/conda install -c conda-forge micromamba
+  # set libmamba solver
+  /opt/anaconda3/bin/conda config --system --set solver libmamba
   # install python
-  /opt/anaconda3/bin/conda install -c anaconda python==3.11
+  /opt/anaconda3/bin/conda install -c anaconda python==3.14
   # install python tools
   /opt/anaconda3/bin/conda config --add channels defaults
   /opt/anaconda3/bin/conda config --add channels bioconda
-  /opt/anaconda3/bin/conda config --add channels conda-forge
+  /opt/anaconda3/bin/conda config --add channels conda-forge 
   # install libraries
   /opt/anaconda3/bin/conda install -c anaconda numpy
   /opt/anaconda3/bin/conda install -c anaconda pandas
@@ -171,12 +179,18 @@ From: ubuntu:26.04
   /opt/anaconda3/bin/conda install pip
   #/opt/anaconda3/bin/pip install scCODA
   # install macs2
-  wget https://github.com/macs3-project/MACS/archive/refs/tags/v3.0.4.tar.gz
-  tar -xvzf MACS-3.0.4.tar.gz
-  cd MACS-3.0.4/
+  #wget -O MACS-3.0.4.tar.gz https://github.com/macs3-project/MACS/archive/refs/tags/v3.0.4.tar.gz
+  #tar -xvzf MACS-3.0.4.tar.gz
+  #cd MACS-3.0.4/
+  git clone --recursive https://github.com/macs3-project/MACS.git
+  cd MACS
+  git pull
+  git fetch --tags
+  git checkout v3.0.4
+  git submodule update --init --recursive
   # patch
   #sed -i 's/tstate->use_tracing/tstate->tracing/g' MACS2/Prob.c
-  /opt/anaconda3/bin/pip install .
+  #/opt/anaconda3/bin/pip install .
   cd
   # install macs3
   /opt/anaconda3/bin/pip install macs3
@@ -184,7 +198,7 @@ From: ubuntu:26.04
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
   git checkout development
-  /opt/anaconda3/bin/pip install .
+  #/opt/anaconda3/bin/pip install .
   cd
 
   # Add support for LDAP authentication
@@ -201,8 +215,8 @@ From: ubuntu:26.04
   R --slave -e 'install.packages("BiocManager")'
 
   # setup github
-  # echo "GITHUB_PAT=${PAT}" >> .Renviron
-  # R --slave -e 'usethis::use_git_config(user.name = "'${USERNAME}'", user.email = "'${EMAIL}'")'
+  echo "GITHUB_PAT=${PAT}" >> .Renviron
+  R --slave -e 'usethis::use_git_config(user.name = "'${USERNAME}'", user.email = "'${EMAIL}'")'
   
 
   # install r packages via CRAN
@@ -249,6 +263,8 @@ From: ubuntu:26.04
   R --slave -e 'install.packages("meta")'
   R --slave -e 'install.packages("bestNormalize")'
   R --slave -e 'install.packages("svMisc")'
+  R --slave -e 'install.packages("harmony")'
+  R --slave -e 'install.packages("grr")'
 
   R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
@@ -299,43 +315,43 @@ From: ubuntu:26.04
   R --slave -e 'install.packages("Signac")'
 
   # # install packages from github
-  # R --slave -e 'devtools::install_github("immunogenomics/harmony")'
-  # R --slave -e 'devtools::install_github("sqjin/CellChat")'
-  # R --slave -e 'devtools::install_github("saeyslab/nichenetr")'
-  # R --slave -e 'devtools::install_github("JinmiaoChenLab/Rphenograph")'
-  # R --slave -e 'devtools::install_github("velocyto-team/velocyto.R")'
-  # R --slave -e 'devtools::install_github(repo = "hhoeflin/hdf5r")'
-  # R --slave -e 'devtools::install_github(repo = "mojaveazure/loomR", ref = "develop")'
-  # R --slave -e 'devtools::install_github("pcahan1/singleCellNet")'
-  # R --slave -e 'devtools::install_github("powellgenomicslab/scPred")'
-  # R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
-  # R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
-  # R --slave -e 'devtools::install_github("caleblareau/BuenColors")'
-  # R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
-  # R --slave -e 'devtools::install_github("satijalab/seurat-data")'
-  # R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  # #R --slave -e 'devtools::install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)'
-  # R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="dev", repos = BiocManager::repositories())'
-  # R --slave -e 'devtools::install_github("MarioniLab/miloR", ref="devel")'
-  # R --slave -e 'devtools::install_github("korsunskylab/rcna")'
-  # R --slave -e 'devtools::install_github("https://github.com/royoelen/roycols")'
-  # R --slave -e 'devtools::install_github("https://github.com/royoelen/mdfiver")'
-  # R --slave -e 'remotes::install_github("cvarrichio/Matrix.utils")'
-  # R --slave -e 'ArchR::installExtraPackages()'
-  # R --slave -e 'devtools::install_github("xuranw/MuSiC")'
-  # R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
-  # R --slave -e 'remotes::install_github("ludvigla/semla")'
-  # R --slave -e 'remotes::install_github("chr1swallace/coloc@main",build_vignettes=TRUE)'
-  # R --slave -e 'devtools::install_github("BIGslu/BIGpicture")'
-  # R --slave -e 'devtools::install_github("BIGslu/kimma")'
-  # R --slave -e 'devtools::install_github("BIGslu/RNAetc")'
-  # R --slave -e 'devtools::install_github("BIGslu/SEARchways")'
-  # R --slave -e 'devtools::install_github("BIGslu/BIGverse")'
-  # R --slave -e 'devtools::install_github("https://github.com/molgenis/ReigenMT")'
+  R --slave -e 'pak::pak("immunogenomics/harmony")'
+  R --slave -e 'pak::pak("sqjin/CellChat")'
+  R --slave -e 'pak::pak("saeyslab/nichenetr")'
+  R --slave -e 'pak::pak("JinmiaoChenLab/Rphenograph")'
+  #R --slave -e 'pak::pak("royoelen/velocyto.R")'
+  R --slave -e 'pak::pak("hhoeflin/hdf5r")'
+  R --slave -e 'pak::pak("mojaveazure/loomR")'
+  R --slave -e 'pak::pak("pcahan1/singleCellNet")'
+  #R --slave -e 'pak::pak("powellgenomicslab/scPred")'
+  R --slave -e 'pak::pak("gaospecial/ggVennDiagram")'
+  R --slave -e 'pak::pak("twbattaglia/MicrobeDS")'
+  R --slave -e 'pak::pak("caleblareau/BuenColors")'
+  R --slave -e 'pak::pak("buenrostrolab/FigR")'
+  R --slave -e 'pak::pak("satijalab/seurat-data")'
+  R --slave -e 'pak::pak("mojaveazure/seurat-disk")'
+  #R --slave -e 'pak::pak("cnfoley/hyprcoloc")'
+  R --slave -e 'pak::pak("GreenleafLab/ArchR")'
+  R --slave -e 'pak::pak("MarioniLab/miloR")'
+  R --slave -e 'pak::pak("korsunskylab/rcna")'
+  R --slave -e 'pak::pak("royoelen/roycols")'
+  R --slave -e 'pak::pak("royoelen/mdfiver")'
+  #R --slave -e 'pak::pak("cvarrichio/Matrix.utils")'
+  R --slave -e 'ArchR::installExtraPackages()'
+  R --slave -e 'pak::pak("xuranw/MuSiC")'
+  R --slave -e 'pak::pak("phipsonlab/speckle")'
+  R --slave -e 'pak::pak("ludvigla/semla")'
+  R --slave -e 'pak::pak("chr1swallace/coloc")'
+  R --slave -e 'pak::pak("BIGslu/BIGpicture")'
+  R --slave -e 'pak::pak("BIGslu/kimma")'
+  R --slave -e 'pak::pak("BIGslu/RNAetc")'
+  R --slave -e 'pak::pak("BIGslu/SEARchways")'
+  R --slave -e 'pak::pak("BIGslu/BIGverse")'
+  R --slave -e 'pak::pak("molgenis/ReigenMT")'
 
   # # this library is a bit problematic
   # export CFLAGS='-mssse3'
-  # R --slave -e 'remotes::install_github("bnprks/BPCells/r")'
+  #R --slave -e 'pak::pak("bnprks/BPCells/r")'
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
