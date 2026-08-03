@@ -1,11 +1,11 @@
 BootStrap: docker
-From: ubuntu:24.04
+From: ubuntu:26.04
 
 %labels
   Maintainer Roy Oelen (roy.oelen@gmail.com)
-  RStudio_Version 2024.12.0-467
-  R_Version 4.4.2
-  Image_Version v2.0.1
+  RStudio_Version 2026.06.0-242
+  R_Version 4.6.1
+  Image_Version v2.1
   Repository https://github.com/royoelen/single-cell-container-server
 
 %help
@@ -30,12 +30,18 @@ From: ubuntu:24.04
 
 %post
   # Software versions
-  export RSTUDIO_VERSION=2024.12.0-467
-  export R_VERSION=4.4.2
+  export RSTUDIO_VERSION=2026.06.0-242
+  export R_VERSION=4.6.1
+
+  # set non-interactive
+  export DEBIAN_FRONTEND=noninteractive
+  # install date dependencies
+  apt-get update
+  apt-get install -y tzdata
 
   # build necessities
   export PAT='yourpat'
-  export EMAIL='youremail@email.com'
+  export EMAIL='youremail@mail.com'
   export USERNAME='yourusername'
 
   # Get dependencies
@@ -80,6 +86,7 @@ From: ubuntu:24.04
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
+    libuv1-dev \
     cmake \
     make \
     g++ \
@@ -98,18 +105,20 @@ From: ubuntu:24.04
   apt-get install -y libudunits2-dev
   apt-get install -y libgdal-dev
   apt-get install -y libgsl-dev
+  apt-get install -y gzip less
+  apt-get install -y default-jdk
 
   # install cuda toolkit
   # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=20.04&target_type=deb_local
-  export DEBIAN_FRONTEND=noninteractive
-  # install latest CUDA
-  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
-  mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-  wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-  dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
-  cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
-  apt-get update
-  apt-get -y install cuda-toolkit-12-8
+  # export DEBIAN_FRONTEND=noninteractive
+  # # install latest CUDA
+  # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+  # mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  # wget https://developer.download.nvidia.com/compute/cuda/12.8.0/local_installers/cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  # dpkg -i cuda-repo-ubuntu2404-12-8-local_12.8.0-570.86.10-1_amd64.deb
+  # cp /var/cuda-repo-ubuntu2404-12-8-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  # apt-get update
+  # apt-get -y install cuda-toolkit-12-8
 
   # Add a default CRAN mirror
   echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl')" >> /usr/lib/R/etc/Rprofile.site
@@ -135,22 +144,30 @@ From: ubuntu:24.04
   echo "directory=~/rstudio-server" >> /etc/rstudio/database.conf
 
   # install conda
-  export CONDA_VERSION=Anaconda3-2024.10-1-Linux-x86_64
+  export CONDA_VERSION=Anaconda3-2025.12-2-Linux-x86_64
   wget https://repo.anaconda.com/archive/${CONDA_VERSION}.sh
   bash ${CONDA_VERSION}.sh -b -p /opt/anaconda3
   chmod +x /opt/anaconda3
-  ln -s /opt/anaconda3/bind/conda /usr/local/bin/conda
+  ln -s /opt/anaconda3/bin/conda /usr/local/bin/conda
   ln -s /opt/anaconda3/bin/pip /usr/local/bin/pip
   ln -s /opt/anaconda3/bin/python /usr/local/bin/python
   rm ${CONDA_VERSION}.sh
+  # accept TOS
+  /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+  /opt/anaconda3/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+  export CONDA_PLUGINS_AUTO_ACCEPT_TOS=yes
   # update conda to the latest version
-  /opt/anaconda3/bin/conda update -n base -c anaconda conda
+  /opt/anaconda3/bin/conda update -y -n base -c anaconda conda
+  # install micromamb
+  /opt/anaconda3/bin/conda install -c conda-forge micromamba
+  # set libmamba solver
+  /opt/anaconda3/bin/conda config --system --set solver libmamba
   # install python
-  /opt/anaconda3/bin/conda install -c anaconda python==3.11
+  /opt/anaconda3/bin/conda install -c anaconda python==3.14
   # install python tools
   /opt/anaconda3/bin/conda config --add channels defaults
   /opt/anaconda3/bin/conda config --add channels bioconda
-  /opt/anaconda3/bin/conda config --add channels conda-forge
+  /opt/anaconda3/bin/conda config --add channels conda-forge 
   # install libraries
   /opt/anaconda3/bin/conda install -c anaconda numpy
   /opt/anaconda3/bin/conda install -c anaconda pandas
@@ -162,12 +179,18 @@ From: ubuntu:24.04
   /opt/anaconda3/bin/conda install pip
   #/opt/anaconda3/bin/pip install scCODA
   # install macs2
-  wget https://github.com/macs3-project/MACS/archive/refs/tags/v2.2.9.1.tar.gz
-  tar -xvzf v2.2.9.1.tar.gz
-  cd MACS-2.2.9.1/
+  #wget -O MACS-3.0.4.tar.gz https://github.com/macs3-project/MACS/archive/refs/tags/v3.0.4.tar.gz
+  #tar -xvzf MACS-3.0.4.tar.gz
+  #cd MACS-3.0.4/
+  git clone --recursive https://github.com/macs3-project/MACS.git
+  cd MACS
+  git pull
+  git fetch --tags
+  git checkout v3.0.4
+  git submodule update --init --recursive
   # patch
   #sed -i 's/tstate->use_tracing/tstate->tracing/g' MACS2/Prob.c
-  /opt/anaconda3/bin/pip install .
+  #/opt/anaconda3/bin/pip install .
   cd
   # install macs3
   /opt/anaconda3/bin/pip install macs3
@@ -175,7 +198,7 @@ From: ubuntu:24.04
   git clone https://github.com/aertslab/scenicplus
   cd scenicplus
   git checkout development
-  /opt/anaconda3/bin/pip install .
+  #/opt/anaconda3/bin/pip install .
   cd
 
   # Add support for LDAP authentication
@@ -239,6 +262,9 @@ From: ubuntu:24.04
   R --slave -e 'install.packages("fastR")'
   R --slave -e 'install.packages("meta")'
   R --slave -e 'install.packages("bestNormalize")'
+  R --slave -e 'install.packages("svMisc")'
+  R --slave -e 'install.packages("harmony")'
+  R --slave -e 'install.packages("grr")'
 
   R --slave -e 'pandoc::pandoc_install()'
   # deprecated package
@@ -288,44 +314,44 @@ From: ubuntu:24.04
   # then signac
   R --slave -e 'install.packages("Signac")'
 
-  # install packages from github
-  R --slave -e 'devtools::install_github("immunogenomics/harmony")'
-  R --slave -e 'devtools::install_github("sqjin/CellChat")'
-  R --slave -e 'devtools::install_github("saeyslab/nichenetr")'
-  R --slave -e 'devtools::install_github("JinmiaoChenLab/Rphenograph")'
-  R --slave -e 'devtools::install_github("velocyto-team/velocyto.R")'
-  R --slave -e 'devtools::install_github(repo = "hhoeflin/hdf5r")'
-  R --slave -e 'devtools::install_github(repo = "mojaveazure/loomR", ref = "develop")'
-  R --slave -e 'devtools::install_github("pcahan1/singleCellNet")'
-  R --slave -e 'devtools::install_github("powellgenomicslab/scPred")'
-  R --slave -e 'devtools::install_github("gaospecial/ggVennDiagram")'
-  R --slave -e 'devtools::install_github("twbattaglia/MicrobeDS")'
-  R --slave -e 'devtools::install_github("caleblareau/BuenColors")'
-  R --slave -e 'devtools::install_github("buenrostrolab/FigR")'
-  R --slave -e 'devtools::install_github("satijalab/seurat-data")'
-  R --slave -e 'devtools::install_github("mojaveazure/seurat-disk")'
-  #R --slave -e 'devtools::install_github("cnfoley/hyprcoloc", build_opts = c("--resave-data", "--no-manual"), build_vignettes = TRUE)'
-  R --slave -e 'devtools::install_github("GreenleafLab/ArchR", ref="dev", repos = BiocManager::repositories())'
-  R --slave -e 'devtools::install_github("MarioniLab/miloR", ref="devel")'
-  R --slave -e 'devtools::install_github("korsunskylab/rcna")'
-  R --slave -e 'devtools::install_github("https://github.com/royoelen/roycols")'
-  R --slave -e 'devtools::install_github("https://github.com/royoelen/mdfiver")'
-  R --slave -e 'remotes::install_github("cvarrichio/Matrix.utils")'
+  # # install packages from github
+  R --slave -e 'pak::pak("immunogenomics/harmony")'
+  R --slave -e 'pak::pak("sqjin/CellChat")'
+  R --slave -e 'pak::pak("saeyslab/nichenetr")'
+  R --slave -e 'pak::pak("JinmiaoChenLab/Rphenograph")'
+  #R --slave -e 'pak::pak("royoelen/velocyto.R")'
+  R --slave -e 'pak::pak("hhoeflin/hdf5r")'
+  R --slave -e 'pak::pak("mojaveazure/loomR")'
+  R --slave -e 'pak::pak("pcahan1/singleCellNet")'
+  #R --slave -e 'pak::pak("powellgenomicslab/scPred")'
+  R --slave -e 'pak::pak("gaospecial/ggVennDiagram")'
+  R --slave -e 'pak::pak("twbattaglia/MicrobeDS")'
+  R --slave -e 'pak::pak("caleblareau/BuenColors")'
+  R --slave -e 'pak::pak("buenrostrolab/FigR")'
+  R --slave -e 'pak::pak("satijalab/seurat-data")'
+  R --slave -e 'pak::pak("mojaveazure/seurat-disk")'
+  #R --slave -e 'pak::pak("cnfoley/hyprcoloc")'
+  R --slave -e 'pak::pak("GreenleafLab/ArchR")'
+  R --slave -e 'pak::pak("MarioniLab/miloR")'
+  R --slave -e 'pak::pak("korsunskylab/rcna")'
+  R --slave -e 'pak::pak("royoelen/roycols")'
+  R --slave -e 'pak::pak("royoelen/mdfiver")'
+  #R --slave -e 'pak::pak("cvarrichio/Matrix.utils")'
   R --slave -e 'ArchR::installExtraPackages()'
-  R --slave -e 'devtools::install_github("xuranw/MuSiC")'
-  R --slave -e 'devtools::install_github("phipsonlab/speckle", build_vignettes = F, repos = BiocManager::repositories())'
-  R --slave -e 'remotes::install_github("ludvigla/semla")'
-  R --slave -e 'remotes::install_github("chr1swallace/coloc@main",build_vignettes=TRUE)'
-  R --slave -e 'devtools::install_github("BIGslu/BIGpicture")'
-  R --slave -e 'devtools::install_github("BIGslu/kimma")'
-  R --slave -e 'devtools::install_github("BIGslu/RNAetc")'
-  R --slave -e 'devtools::install_github("BIGslu/SEARchways")'
-  R --slave -e 'devtools::install_github("BIGslu/BIGverse")'
-  R --slave -e 'devtools::install_github("https://github.com/molgenis/ReigenMT")'
+  R --slave -e 'pak::pak("xuranw/MuSiC")'
+  R --slave -e 'pak::pak("phipsonlab/speckle")'
+  R --slave -e 'pak::pak("ludvigla/semla")'
+  R --slave -e 'pak::pak("chr1swallace/coloc")'
+  R --slave -e 'pak::pak("BIGslu/BIGpicture")'
+  R --slave -e 'pak::pak("BIGslu/kimma")'
+  R --slave -e 'pak::pak("BIGslu/RNAetc")'
+  R --slave -e 'pak::pak("BIGslu/SEARchways")'
+  R --slave -e 'pak::pak("BIGslu/BIGverse")'
+  R --slave -e 'pak::pak("molgenis/ReigenMT")'
 
-  # this library is a bit problematic
-  export CFLAGS='-mssse3'
-  R --slave -e 'remotes::install_github("bnprks/BPCells/r")'
+  # # this library is a bit problematic
+  # export CFLAGS='-mssse3'
+  #R --slave -e 'pak::pak("bnprks/BPCells/r")'
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
