@@ -245,7 +245,7 @@ mkdir -p ${TMPDIR}/etc
 mkdir -p ${TMPDIR}/tmp
 mkdir -p ${TMPDIR}/server-data
 mkdir -p ${TMPDIR}/lib
-echo "www-port=8754" > ${TMPDIR}/etc/rserver.conf
+echo "www-port=8754" > ${TMPDIR}/${USER}/etc/rserver.conf
 singularity run  --bind \
 /home3/${USER}/singularity/rstudio-server/simulated_home:/home/${USER},\
 /home3/${USER}/singularity/rstudio-server/simulated_home:/home3/${USER},\
