@@ -250,7 +250,6 @@ singularity run  --bind \
 /home3/${USER}/singularity/rstudio-server/simulated_home:/home/${USER},\
 /home3/${USER}/singularity/rstudio-server/simulated_home:/home3/${USER},\
 /scratch/${USER}/,\
-${TMPDIR},\
 ${TMPDIR}/rstudio-server-logging:/var/run/rstudio-server,\
 ${TMPDIR}/lib:/var/lib/rstudio-server,\
 ${TMPDIR}/etc:/etc/rstudio,\
